@@ -212,8 +212,7 @@ class TodoApp:
         self.main_frame.pack_forget()
         self.login_frame.pack()
         self.current_user = None
-        
-        
+
 # Lancer l'application
 if __name__ == "__main__":
     root = tk.Tk()
