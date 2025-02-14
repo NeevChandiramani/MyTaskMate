@@ -214,53 +214,6 @@ class TodoApp:
         self.current_user = None
         
         
-    def edit_task(task_id, new_description=None, new_due_date=None, new_priority=None, mark_completed=None):
-    query = 'UPDATE tasks SET '
-    params = []
-    if new_description is not None:
-        query += 'task_description = ?, '
-        params.append(new_description)
-    if new_due_date is not None:
-        query += 'due_date = ?, '
-        params.append(new_due_date)
-    if new_priority is not None:
-        query += 'priority = ?, '
-        params.append(new_priority)
-    if mark_completed is not None:
-        query += 'is_completed = ?, '
-        params.append(mark_completed)
-    query = query.rstrip(', ') + ' WHERE task_id = ?'
-    params.append(task_id)
-    cursor.execute(query, tuple(params))
-    conn.commit()
-
-# In TodoApp class, add methods for delete, edit, and sorting/filtering
-
-    def delete_task(self):
-        selected_task_index = self.task_listbox.curselection()
-        if not selected_task_index:
-            messagebox.showwarning('No Selection', 'Please select a task to delete')
-            return
-        task_id = get_tasks(self.current_user)[selected_task_index[0]][0]
-        delete_task(task_id)
-        self.refresh_tasks()
-
-    def edit_task(self):
-        # Implement a dialog similar to add_task but pre-filled
-        pass
-
-    def display_options(self, option):
-        # Implement view modes such as only task names, completed tasks only, etc.
-        pass
-
-    def sort_tasks(self, criteria):
-        # Implement sorting by due date, priority, etc.
-        pass
-
-    def filter_tasks(self, criteria):
-        # Implement filtering such as show only high priority or overdue tasks
-        pass
-
 # Lancer l'application
 if __name__ == "__main__":
     root = tk.Tk()
