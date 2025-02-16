@@ -5,19 +5,23 @@ from datetime import datetime
 import threading
 import time
 
-# Connexion à la base de données SQLite
+# La fonction "connect()" permet de se connecter à la base de donnée
 conn = sqlite3.connect('todo_list.db')
+
+# La fonction "cursor()"" permet d'intéragir avec la base de donnée et d'utiliser les différentes requêtes SQL
 cursor = conn.cursor()
 
 # Création des tables
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS utilisateur (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL
+    identifiant TEXT UNIQUE NOT NULL,       
+    mdp TEXT NOT NULL
 )
 ''')
 
+# "NOT NULL" indique que la valeur ne peut pas être nul
+# "AUTOINCREMENT" génère automatiquement une valeur unique pour chaque enregistrement
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS tasks (
     task_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,22 +30,25 @@ CREATE TABLE IF NOT EXISTS tasks (
     due_date TEXT NOT NULL,
     is_completed BOOLEAN NOT NULL,
     priority TEXT CHECK( priority IN ('low', 'medium', 'high') ) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    FOREIGN KEY (user_id) REFERENCES utilisateur (user_id)
 )
 ''')
+
+# La fonction "commit()" permet d'enregistrer les modifications faites sur la base de donnée
 conn.commit()
 
 # Fonctions pour la gestion des utilisateurs
-def create_user(username, password_hash):
+def créer_utilisateur(identifiant, mdp):
     try:
-        cursor.execute('INSERT INTO users (username, password_hash) VALUES (?, ?)', (username, password_hash))
+        cursor.execute('INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)', (identifiant, mdp))
         conn.commit()
         return True
     except sqlite3.IntegrityError:
         return False
 
-def login_user(username, password_hash):
-    cursor.execute('SELECT * FROM users WHERE username = ? AND password_hash = ?', (username, password_hash))
+# La fonction "fetchone()" prend le 1er enregistrement, ici elle vérifie si il y a bien un enregistrement
+def login_user(identifiant, mdp):
+    cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (identifiant, mdp))
     return cursor.fetchone() is not None
 
 # Fonctions pour la gestion des tâches
@@ -98,10 +105,10 @@ class TodoApp:
         self.login_frame = ttk.Frame(root)
         self.login_frame.pack(padx=10, pady=10)
 
-        self.username_label = ttk.Label(self.login_frame, text="Username")
-        self.username_label.grid(row=0, column=0, padx=5, pady=5)
-        self.username_entry = ttk.Entry(self.login_frame)
-        self.username_entry.grid(row=0, column=1, padx=5, pady=5)
+        self.identifiant_label = ttk.Label(self.login_frame, text="Identifiant")
+        self.identifiant_label.grid(row=0, column=0, padx=5, pady=5)
+        self.identifiant_entry = ttk.Entry(self.login_frame)
+        self.identifiant_entry.grid(row=0, column=1, padx=5, pady=5)
 
         self.password_label = ttk.Label(self.login_frame, text="Password")
         self.password_label.grid(row=1, column=0, padx=5, pady=5)
@@ -115,22 +122,22 @@ class TodoApp:
         self.create_account_button.grid(row=3, column=0, columnspan=2, pady=10)
 
     def login(self):
-        username = self.username_entry.get()
+        identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
-        if login_user(username, password):
-            cursor.execute('SELECT user_id FROM users WHERE username = ?', (username,))
+        if login_user(identifiant, password):
+            cursor.execute('SELECT user_id FROM utilisateur WHERE identifiant = ?', (identifiant,))
             self.current_user = cursor.fetchone()[0]
             self.show_main_frame()
         else:
-            messagebox.showerror("Login Failed", "Invalid username or password")
+            messagebox.showerror("Login Failed", "Invalid identifiant or password")
 
     def create_account(self):
-        username = self.username_entry.get()
+        identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
-        if create_user(username, password):
+        if créer_utilisateur(identifiant, password):
             messagebox.showinfo("Account Created", "Your account has been created successfully")
         else:
-            messagebox.showerror("Account Creation Failed", "Username already exists")
+            messagebox.showerror("Account Creation Failed", "identifiant already exists")
 
     def show_main_frame(self):
         self.login_frame.pack_forget()
