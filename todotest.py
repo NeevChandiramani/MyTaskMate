@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 conn.commit()
 
 # Fonctions pour la gestion des utilisateurs
-def créer_utilisateur(identifiant, mdp):
+def créer_compte(identifiant, mdp):
     try:
         cursor.execute('INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)', (identifiant, mdp))
         conn.commit()
@@ -47,12 +47,12 @@ def créer_utilisateur(identifiant, mdp):
         return False
 
 # La fonction "fetchone()" prend le 1er enregistrement, ici elle vérifie si il y a bien un enregistrement
-def login_user(identifiant, mdp):
+def se_connecter(identifiant, mdp):
     cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (identifiant, mdp))
     return cursor.fetchone() is not None
 
 # Fonctions pour la gestion des tâches
-def add_task(user_id, description, due_date, priority):
+def ajouter_tache(user_id, description, due_date, priority):
     cursor.execute('INSERT INTO tasks (user_id, task_description, due_date, is_completed, priority) VALUES (?, ?, ?, ?, ?)',
                    (user_id, description, due_date, False, priority))
     conn.commit()
@@ -79,23 +79,25 @@ class TaskScheduler:
     def __init__(self):
         self.tasks = []
 
-    def add_task(self, task):
+    def ajouter_tache(self, task):
         self.tasks.append(task)
 
     def run(self):
         while True:
-            now = datetime.now()
             for task in self.tasks:
                 due_date = datetime.strptime(task[3], '%Y-%m-%d')
-                if now > due_date and not task[4]:
-                    print(f"Task {task[2]} is overdue!")
-            time.sleep(60)  # Vérifie toutes les minutes
+                if datetime.now() > due_date and not task[4]:
+                    print(f"La tâche {task[2]} est expirée!")
+            # Vérifie toutes les minutes avec le time.sleep
+            time.sleep(60)
+
+
 
 # Interface graphique avec tkinter
 class TodoApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("To-Do List Application")
+        self.root.title("")
         self.current_user = None
 
         self.style = ttk.Style()
@@ -110,34 +112,34 @@ class TodoApp:
         self.identifiant_entry = ttk.Entry(self.login_frame)
         self.identifiant_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        self.password_label = ttk.Label(self.login_frame, text="Password")
+        self.password_label = ttk.Label(self.login_frame, text="Mot de passe")
         self.password_label.grid(row=1, column=0, padx=5, pady=5)
         self.password_entry = ttk.Entry(self.login_frame, show="*")
         self.password_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        self.login_button = ttk.Button(self.login_frame, text="Login", command=self.login)
+        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login)
         self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
 
-        self.create_account_button = ttk.Button(self.login_frame, text="Create Account", command=self.create_account)
+        self.create_account_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.create_account)
         self.create_account_button.grid(row=3, column=0, columnspan=2, pady=10)
 
     def login(self):
         identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
-        if login_user(identifiant, password):
+        if se_connecter(identifiant, password):
             cursor.execute('SELECT user_id FROM utilisateur WHERE identifiant = ?', (identifiant,))
             self.current_user = cursor.fetchone()[0]
             self.show_main_frame()
         else:
-            messagebox.showerror("Login Failed", "Invalid identifiant or password")
+            messagebox.showerror("Connection échouée", "L'identifiant ou le mot de passe est incorrect")
 
     def create_account(self):
         identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
-        if créer_utilisateur(identifiant, password):
-            messagebox.showinfo("Account Created", "Your account has been created successfully")
+        if créer_compte(identifiant, password):
+            messagebox.showinfo("Compte créé", "Votre compte a été créé avec succès")
         else:
-            messagebox.showerror("Account Creation Failed", "identifiant already exists")
+            messagebox.showerror("Création échouée", "L'identifiant est déjà enregistré")
 
     def show_main_frame(self):
         self.login_frame.pack_forget()
@@ -149,13 +151,13 @@ class TodoApp:
 
         self.refresh_tasks()
 
-        self.add_task_button = ttk.Button(self.main_frame, text="Add Task", command=self.add_task)
-        self.add_task_button.grid(row=1, column=0, pady=5)
+        self.ajouter_tache_button = ttk.Button(self.main_frame, text="Ajouter une tâche", command=self.ajouter_tache)
+        self.ajouter_tache_button.grid(row=1, column=0, pady=5)
 
-        self.mark_completed_button = ttk.Button(self.main_frame, text="Mark as Completed", command=self.mark_completed)
+        self.mark_completed_button = ttk.Button(self.main_frame, text="Marquer comme complétée", command=self.mark_completed)
         self.mark_completed_button.grid(row=1, column=1, pady=5)
 
-        self.logout_button = ttk.Button(self.main_frame, text="Logout", command=self.logout)
+        self.logout_button = ttk.Button(self.main_frame, text="Se déconnecter", command=self.logout)
         self.logout_button.grid(row=1, column=2, pady=5)
 
     def refresh_tasks(self):
@@ -173,21 +175,21 @@ class TodoApp:
             else:
                 self.task_listbox.insert(tk.END, task_text)
 
-    def add_task(self):
+    def ajouter_tache(self):
         task_window = tk.Toplevel(self.root)
-        task_window.title("Add Task")
+        task_window.title("Ajouter une tâche")
 
-        description_label = ttk.Label(task_window, text="Task Description")
+        description_label = ttk.Label(task_window, text="Nom de la tâche")
         description_label.grid(row=0, column=0, padx=5, pady=5)
         description_entry = ttk.Entry(task_window)
         description_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        due_date_label = ttk.Label(task_window, text="Due Date (YYYY-MM-DD)")
+        due_date_label = ttk.Label(task_window, text="Date limite (JJ-MM-AAAA)")
         due_date_label.grid(row=1, column=0, padx=5, pady=5)
         due_date_entry = ttk.Entry(task_window)
         due_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        priority_label = ttk.Label(task_window, text="Priority (low, medium, high)")
+        priority_label = ttk.Label(task_window, text="Priorité (low, medium, high)")
         priority_label.grid(row=2, column=0, padx=5, pady=5)
         priority_entry = ttk.Entry(task_window)
         priority_entry.grid(row=2, column=1, padx=5, pady=5)
@@ -196,12 +198,12 @@ class TodoApp:
             description = description_entry.get()
             due_date = due_date_entry.get()
             priority = priority_entry.get()
-            add_task(self.current_user, description, due_date, priority)
+            ajouter_tache(self.current_user, description, due_date, priority)
             self.refresh_tasks()
             task_window.destroy()
 
-        save_button = ttk.Button(task_window, text="Save Task", command=save_task)
-        save_button.grid(row=3, column=0, columnspan=2, pady=10)
+        boutton_enregistrement = ttk.Button(task_window, text="Enregistrer la tâche", command=save_task)
+        boutton_enregistrement.grid(row=3, column=0, columnspan=2, pady=10)
 
     def mark_completed(self):
         selected_task_index = self.task_listbox.curselection()
