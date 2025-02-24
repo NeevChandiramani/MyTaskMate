@@ -146,7 +146,7 @@ class Todolist:
         description_entry = ttk.Entry(fenetre_tache, width=40)
         description_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        ttk.Label(fenetre_tache, text="Date d'échéance:").grid(row=1, column=0, padx=5, pady=5)
+        ttk.Label(fenetre_tache, text="Date d'échéance: (JJ-MM-AAAA)").grid(row=1, column=0, padx=5, pady=5)
         due_date_entry = ttk.Entry(fenetre_tache, width=40)
         due_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
