@@ -1,9 +1,11 @@
 import sqlite3
-import tkinter as tk
-from tkinter import ttk, messagebox
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+from tkinter import messagebox, Listbox, END
 from datetime import datetime
 import threading
 import time
+from PIL import Image, ImageTk
 
 # La fonction "connect()" permet de se connecter à la base de donnée
 conn = sqlite3.connect('todo_list.db')
@@ -15,7 +17,7 @@ cursor = conn.cursor()
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS utilisateur (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    identifiant TEXT UNIQUE NOT NULL,       
+    identifiant TEXT UNIQUE NOT NULL,
     mdp TEXT NOT NULL
 )
 ''')
@@ -46,12 +48,10 @@ def créer_compte(identifiant, mdp):
     except sqlite3.IntegrityError:
         return False
 
-
 # La fonction "fetchone()" prend le 1er enregistrement, ici elle vérifie si il y a bien un enregistrement
 def se_connecter(identifiant, mdp):
     cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (identifiant, mdp))
     return cursor.fetchone() is not None
-
 
 # Fonctions pour la gestion des tâches
 def ajouter_tache(user_id, description, due_date, priority):
@@ -59,164 +59,100 @@ def ajouter_tache(user_id, description, due_date, priority):
                    (user_id, description, due_date, False, priority))
     conn.commit()
 
+def get_tasks(user_id):
+    cursor.execute('SELECT * FROM tasks WHERE user_id = ? AND is_completed = ?', (user_id, False))
+    return cursor.fetchall()
 
-def maj_tache(task_id, description, due_date, priority):
-    cursor.execute('UPDATE tasks SET task_description = ?, due_date = ?, priority = ? WHERE task_id = ?',
-                   (description, due_date, priority, task_id))
+def marquer_tache_complete(task_id):
+    cursor.execute('UPDATE tasks SET is_completed = ? WHERE task_id = ?', (True, task_id))
     conn.commit()
-
 
 def supprimer_tache(task_id):
     cursor.execute('DELETE FROM tasks WHERE task_id = ?', (task_id,))
     conn.commit()
 
-
-def marquer_tache_complete(task_id):
-    cursor.execute('UPDATE tasks SET is_completed = TRUE WHERE task_id = ?', (task_id,))
-    conn.commit()
-
-
-def get_tasks(user_id):
-    cursor.execute('SELECT * FROM tasks WHERE user_id = ?', (user_id,))
-    return cursor.fetchall()
-
-
-# Classe d'ordonnancement pour gérer les états des tâches
 class Planificateur:
-    def __init__(self):
-        self.tasks = []
-
-
-    def ajouter_tache(self, task):
-        self.tasks.append(task)
-
-
     def run(self):
         while True:
-            for task in self.tasks:
-                due_date = datetime.strptime(task[3], '%Y-%m-%d')
-                if datetime.now() > due_date and not task[4]:
-                    print(f"La tâche {task[2]} est expirée!")
-            # Vérifie toutes les minutes avec le time.sleep
-            time.sleep(60)
+            time.sleep(1)
+            # Logique de planification ici
 
-
-
-# Interface graphique avec tkinter
 class Todolist:
-    def __init__(self, principale):
-        self.principale = principale
-        self.principale.title("To do list tg3 code créa michoucroute dans la boutique les gars")
+    def __init__(self, root):
+        self.root = root
         self.current_user = None
 
-        self.style = ttk.Style()
-        self.style.configure("TLabel", font=("Helvetica", 12))
-        self.style.configure("TButton", font=("Helvetica", 12))
+        # Configuration du style
+        style = ttk.Style()
+        style.configure('TButton', font=('Helvetica', 12))
+        style.configure('TLabel', font=('Helvetica', 12))
 
-        self.login_frame = ttk.Frame(principale)
+        # Création du cadre de connexion
+        self.login_frame = ttk.Frame(root)
         self.login_frame.pack(padx=10, pady=10)
 
-        self.identifiant_label = ttk.Label(self.login_frame, text="Identifiant")
-        self.identifiant_label.grid(row=0, column=0, padx=5, pady=5)
+        ttk.Label(self.login_frame, text="Identifiant:").grid(row=0, column=0, padx=5, pady=5)
         self.identifiant_entry = ttk.Entry(self.login_frame)
         self.identifiant_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        self.password_label = ttk.Label(self.login_frame, text="Mot de passe")
-        self.password_label.grid(row=1, column=0, padx=5, pady=5)
-        self.password_entry = ttk.Entry(self.login_frame, show="*")
-        self.password_entry.grid(row=1, column=1, padx=5, pady=5)
+        ttk.Label(self.login_frame, text="Mot de passe:").grid(row=1, column=0, padx=5, pady=5)
+        self.mdp_entry = ttk.Entry(self.login_frame, show="*")
+        self.mdp_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login)
-        self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
+        ttk.Button(self.login_frame, text="Se connecter", command=self.login).grid(row=2, column=0, columnspan=2, pady=5)
+        ttk.Button(self.login_frame, text="Créer un compte", command=self.create_account).grid(row=3, column=0, columnspan=2, pady=5)
 
-        self.créer_compte_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.créer_compte)
-        self.créer_compte_button.grid(row=3, column=0, columnspan=2, pady=10)
+        # Création du cadre principal
+        self.main_frame = ttk.Frame(root)
+        self.task_listbox = Listbox(self.main_frame, width=50)
+        self.task_listbox.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
+        ttk.Button(self.main_frame, text="Ajouter une tâche", command=self.add_task).grid(row=1, column=0, padx=5, pady=5)
+        ttk.Button(self.main_frame, text="Marquer comme complétée", command=self.mark_completed).grid(row=1, column=1, padx=5, pady=5)
+        ttk.Button(self.main_frame, text="Supprimer la tâche", command=self.supprimer_tache).grid(row=2, column=0, padx=5, pady=5)
+        ttk.Button(self.main_frame, text="Se déconnecter", command=self.logout).grid(row=2, column=1, padx=5, pady=5)
 
     def login(self):
         identifiant = self.identifiant_entry.get()
-        password = self.password_entry.get()
-        if se_connecter(identifiant, password):
-            cursor.execute('SELECT user_id FROM utilisateur WHERE identifiant = ?', (identifiant,))
-            self.current_user = cursor.fetchone()[0]
-            self.show_main_frame()
+        mdp = self.mdp_entry.get()
+        if se_connecter(identifiant, mdp):
+            self.current_user = identifiant
+            self.login_frame.pack_forget()
+            self.main_frame.pack()
+            self.refresh_tasks()
         else:
-            messagebox.showerror("Connection échouée", "L'identifiant ou le mot de passe est incorrect")
+            messagebox.showerror("Erreur de connexion", "Identifiant ou mot de passe incorrect")
 
-
-    def créer_compte(self):
+    def create_account(self):
         identifiant = self.identifiant_entry.get()
-        password = self.password_entry.get()
-        if créer_compte(identifiant, password):
-            messagebox.showinfo("Compte créé", "Votre compte a été créé avec succès")
+        mdp = self.mdp_entry.get()
+        if créer_compte(identifiant, mdp):
+            messagebox.showinfo("Succès", "Compte créé avec succès")
         else:
-            messagebox.showerror("Création échouée", "L'identifiant est déjà enregistré")
-
-
-    def show_main_frame(self):
-        self.login_frame.pack_forget()
-        self.main_frame = ttk.Frame(self.principale)
-        self.main_frame.pack(padx=10, pady=10)
-
-        self.task_listbox = tk.Listbox(self.main_frame, height=15, width=50, font=("Helvetica", 12))
-        self.task_listbox.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
-
-        self.refresh_tasks()
-
-        self.ajouter_tache_button = ttk.Button(self.main_frame, text="Ajouter une tâche", command = self.ajouter_tache)
-        self.ajouter_tache_button.grid(row=1, column=0, pady=5)
-
-        self.complete_button = ttk.Button(self.main_frame, text = "Marquer comme complétée", command = self.mark_completed)
-        self.complete_button.grid(row = 1, column = 1, pady = 5)
-
-        self.deco_button = ttk.Button(self.main_frame, text = "Se déconnecter", command = self.logout)
-        self.deco_button.grid(row = 1, column = 2, pady = 5)
-
-        self.supprimer_button = ttk.Button(self.main_frame, text ="Supprimer la tâche", command = self.supprimer_tache)
-        self.supprimer_button.grid(row = 1, column = 3, pady = 5)
-
+            messagebox.showerror("Erreur", "Impossible de créer le compte")
 
     def refresh_tasks(self):
-        self.task_listbox.delete(0, tk.END)
-        tasks = get_tasks(self.current_user)
-        for task in tasks:
-            task_text = f"{task[2]} - Due: {task[3]} - Priority: {task[5]}"
-            if task[4]:
-                task_text += " - Completed"
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'gray'})
-            elif task[5] == 'low' :
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'green'})
-            elif task[5] == 'medium' :
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'orange'})
-            elif task[5] == 'high':
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'red'})
-            else:
-                self.task_listbox.insert(tk.END, task_text)
+        if hasattr(self, 'task_listbox'):
+            self.task_listbox.delete(0, END)
+            tasks = get_tasks(self.current_user)
+            for task in tasks:
+                self.task_listbox.insert(END, f"{task[2]} - Date d'échéance (JJ-MM-AAAA): {task[3]} - Priorité: {task[5]}")
 
-
-    def ajouter_tache(self):
-        fenetre_tache = tk.Toplevel(self.principale)
+    def add_task(self):
+        fenetre_tache = ttk.Toplevel(self.root)
         fenetre_tache.title("Ajouter une tâche")
 
-        description_label = ttk.Label(fenetre_tache, text="Nom de la tâche")
-        description_label.grid(row=0, column=0, padx=5, pady=5)
-        description_entry = ttk.Entry(fenetre_tache)
+        ttk.Label(fenetre_tache, text="Description:").grid(row=0, column=0, padx=5, pady=5)
+        description_entry = ttk.Entry(fenetre_tache, width=40)
         description_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        due_date_label = ttk.Label(fenetre_tache, text="Date limite (JJ-MM-AAAA)")
-        due_date_label.grid(row=1, column=0, padx=5, pady=5)
-        due_date_entry = ttk.Entry(fenetre_tache)
+        ttk.Label(fenetre_tache, text="Date d'échéance:").grid(row=1, column=0, padx=5, pady=5)
+        due_date_entry = ttk.Entry(fenetre_tache, width=40)
         due_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        priority_label = ttk.Label(fenetre_tache, text="Priorité (low, medium, high)")
-        priority_label.grid(row=2, column=0, padx=5, pady=5)
-        priority_entry = ttk.Entry(fenetre_tache)
+        ttk.Label(fenetre_tache, text="Priorité (low, medium, high):").grid(row=2, column=0, padx=5, pady=5)
+        priority_entry = ttk.Entry(fenetre_tache, width=40)
         priority_entry.grid(row=2, column=1, padx=5, pady=5)
-
 
         def enregistrer_tache():
             description = description_entry.get()
@@ -226,15 +162,14 @@ class Todolist:
             self.refresh_tasks()
             fenetre_tache.destroy()
 
-        def annuler() :
+        def annuler():
             fenetre_tache.destroy()
 
-        boutton_enregistrement = ttk.Button(fenetre_tache, text = "Enregistrer la tâche", command = enregistrer_tache)
-        boutton_enregistrement.grid(row = 3, column = 1, pady = 5)
+        boutton_enregistrement = ttk.Button(fenetre_tache, text="Enregistrer la tâche", command=enregistrer_tache)
+        boutton_enregistrement.grid(row=3, column=1, pady=5)
 
-        boutton_annuler = ttk.Button(fenetre_tache, text = "Annuler", command = annuler)
-        boutton_annuler.grid(row = 3, column = 0, pady = 5)
-
+        boutton_annuler = ttk.Button(fenetre_tache, text="Annuler", command=annuler)
+        boutton_annuler.grid(row=3, column=0, pady=5)
 
     def mark_completed(self):
         tache_selectionnee = self.task_listbox.curselection()
@@ -247,7 +182,6 @@ class Todolist:
         marquer_tache_complete(task_id)
         self.refresh_tasks()
 
-
     def supprimer_tache(self):
         tache_selectionnee = self.task_listbox.curselection()
         tache_selectionnee = tache_selectionnee[0]
@@ -256,7 +190,6 @@ class Todolist:
         supprimer_tache(task_id)
         self.refresh_tasks()
 
-
     def logout(self):
         self.main_frame.pack_forget()
         self.login_frame.pack()
@@ -264,12 +197,13 @@ class Todolist:
 
 # Lancer l'application
 if __name__ == "__main__":
-    principale = tk.Tk()
-    app = Todolist(principale)
+    app = ttk.Window(themename="darkly")  # Appliquez un thème moderne
+    todolist = Todolist(app)
 
     # Démarrer le planificateur de tâches dans un thread séparé
     scheduler = Planificateur()
     scheduler_thread = threading.Thread(target=scheduler.run, daemon=True)
     scheduler_thread.start()
 
-    principale.mainloop()
+    app.mainloop()
+
