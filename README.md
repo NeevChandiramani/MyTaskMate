@@ -27,7 +27,7 @@ Pour exécuter ce projet, vous devez avoir Python installé sur votre machine. S
 
 Pour utiliser l'application, exécutez simplement le script principal :
 ```bash
-python main.py
+python3 todoapp.py
 ```
 
 L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâches. ✅📅
