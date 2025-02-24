@@ -1,3 +1,4 @@
+
 import sqlite3
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -106,7 +107,7 @@ class Planificateur:
 class Todolist:
     def __init__(self, principale):
         self.principale = principale
-        self.principale.title("To do list tg3 code créa michoucroute dans la boutique")
+        self.principale.title("To do list tg3 code créa michoucroute dans la boutique les gars")
         self.current_user = None
 
         self.style = ttk.Style()
@@ -129,8 +130,8 @@ class Todolist:
         self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login)
         self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
 
-        self.create_account_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.create_account)
-        self.create_account_button.grid(row=3, column=0, columnspan=2, pady=10)
+        self.créer_compte_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.créer_compte)
+        self.créer_compte_button.grid(row=3, column=0, columnspan=2, pady=10)
 
 
     def login(self):
@@ -144,7 +145,7 @@ class Todolist:
             messagebox.showerror("Connection échouée", "L'identifiant ou le mot de passe est incorrect")
 
 
-    def create_account(self):
+    def créer_compte(self):
         identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
         if créer_compte(identifiant, password):
@@ -185,6 +186,12 @@ class Todolist:
                 task_text += " - Completed"
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'gray'})
+            elif task[5] == 'low' :
+                self.task_listbox.insert(tk.END, task_text)
+                self.task_listbox.itemconfig(tk.END, {'fg': 'green'})
+            elif task[5] == 'medium' :
+                self.task_listbox.insert(tk.END, task_text)
+                self.task_listbox.itemconfig(tk.END, {'fg': 'orange'})
             elif task[5] == 'high':
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'red'})
@@ -233,7 +240,7 @@ class Todolist:
     def mark_completed(self):
         tache_selectionnee = self.task_listbox.curselection()
         if not tache_selectionnee:
-            messagebox.showwarning("No Selection", "Please select a task to mark as completed")
+            messagebox.showwarning("Aucune séléction", "Choisissez une tâche à marquer comme complétée")
             return
         tache_selectionnee = tache_selectionnee[0]
         tasks = get_tasks(self.current_user)
