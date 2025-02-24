@@ -115,6 +115,8 @@ class Todolist:
         self.style = ttk.Style()
         self.style.configure("TLabel", font=("Helvetica", 12))
         self.style.configure("TButton", font=("Helvetica", 12))
+        self.style.configure("arrondi.TButton", borderwidth=0, focusthickness=0, focuscolor="None", padding=6, relief="flat", foreground="white", borderradius=10)
+
 
         self.login_frame = ttk.Frame(principale)
         self.login_frame.pack(padx=10, pady=10)
@@ -129,7 +131,7 @@ class Todolist:
         self.password_entry = ttk.Entry(self.login_frame, show="*")
         self.password_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login)
+        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login, style = "arrondi.TButton")
         self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
 
         self.créer_compte_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.créer_compte)
@@ -169,21 +171,21 @@ class Todolist:
         self.ajouter_tache_button = ttk.Button(self.main_frame, text="Ajouter une tâche", command = self.ajouter_tache)
         self.ajouter_tache_button.grid(row=1, column=0, pady=5)
 
-        self.complete_button = ttk.Button(self.main_frame, text = "Marquer comme complétée", command = self.mark_completed)
+        self.complete_button = ttk.Button(self.main_frame, text = "Marquer comme complêtée", command = self.mark_completed)
         self.complete_button.grid(row = 1, column = 1, pady = 5)
 
         self.deco_button = ttk.Button(self.main_frame, text = "Se déconnecter", command = self.logout)
-        self.deco_button.grid(row = 1, column = 2, pady = 5)
+        self.deco_button.grid(row = 2, column = 1, pady = 5)
 
         self.supprimer_button = ttk.Button(self.main_frame, text ="Supprimer la tâche", command = self.supprimer_tache)
-        self.supprimer_button.grid(row = 1, column = 3, pady = 5)
+        self.supprimer_button.grid(row = 2, column = 0, pady = 5)
 
 
     def refresh_tasks(self):
         self.task_listbox.delete(0, tk.END)
         tasks = get_tasks(self.current_user)
         for task in tasks:
-            task_text = f"{task[2]} - Due: {task[3]} - Priority: {task[5]}"
+            task_text = f"{task[2]} - Échéance: {task[3]} - Priorité: {task[5]}"
             if task[4]:
                 task_text += " - Completed"
                 self.task_listbox.insert(tk.END, task_text)
@@ -202,7 +204,7 @@ class Todolist:
 
 
     def ajouter_tache(self):
-        fenetre_tache = tk.Toplevel(self.principale)
+        fenetre_tache = tk.Toplevel(principale)
         fenetre_tache.title("Ajouter une tâche")
 
         description_label = ttk.Label(fenetre_tache, text="Nom de la tâche")
@@ -215,19 +217,32 @@ class Todolist:
         due_date_entry = ttk.Entry(fenetre_tache)
         due_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        priority_label = ttk.Label(fenetre_tache, text="Priorité (low, medium, high)")
+
+        priority_label = ttk.Label(fenetre_tache, text="Priorité")
         priority_label.grid(row=2, column=0, padx=5, pady=5)
-        priority_entry = ttk.Entry(fenetre_tache)
-        priority_entry.grid(row=2, column=1, padx=5, pady=5)
+
+        choix_prio = tk.StringVar()
+        combobox = ttk.Combobox(fenetre_tache, textvariable = choix_prio)
+        combobox['values'] = ("Faible", "Moyenne", "Haute")
+        combobox.bind('Séléction', choix_prio.get())
+        combobox.grid(row = 2, column = 1, padx = 5, pady = 5)
 
 
         def enregistrer_tache():
             description = description_entry.get()
             due_date = due_date_entry.get()
-            priority = priority_entry.get()
-            ajouter_tache(self.current_user, description, due_date, priority)
-            self.refresh_tasks()
-            fenetre_tache.destroy()
+            priority = None
+            if choix_prio.get() == 'Faible' :
+                priority = 'low'
+            elif choix_prio.get() == 'Moyenne' :
+                priority = 'medium'
+            elif choix_prio.get() == 'Haute' :
+                priority = 'high'
+            if priority is not None :      
+                ajouter_tache(self.current_user, description, due_date, priority)
+                self.refresh_tasks()
+                fenetre_tache.destroy()
+
 
         def annuler() :
             fenetre_tache.destroy()
