@@ -1,6 +1,3 @@
-Voici un exemple de fichier `README.md` pour votre application de to-do list en Python :
-
-```markdown
 # NSI-Projet-TodoList
 
 Ce projet est une application de to-do list écrite en Python. Elle permet aux utilisateurs de gérer leurs tâches quotidiennes facilement.
@@ -47,5 +44,3 @@ L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâche
 - [ ] Permettre la synchronisation des tâches avec un service en ligne.
 
 N'hésitez pas à contribuer à ce projet en soumettant des pull requests ou en ouvrant des issues pour signaler des bugs ou proposer des améliorations.
-
-```
