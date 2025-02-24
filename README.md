@@ -1,8 +1,8 @@
-# NSI-Projet-TodoList
+# 📋 NSI-Projet-TodoList
 
-Ce projet est une application de to-do list écrite en Python. Elle permet aux utilisateurs de gérer leurs tâches quotidiennes facilement.
+Bienvenue dans le projet **NSI-Projet-TodoList** ! Cette application est une to-do list écrite en Python qui vous aide à gérer vos tâches quotidiennes facilement. 📝✨
 
-## Installation
+## 🚀 Installation
 
 Pour exécuter ce projet, vous devez avoir Python installé sur votre machine. Suivez les étapes ci-dessous pour configurer et exécuter l'application :
 
@@ -23,24 +23,24 @@ Pour exécuter ce projet, vous devez avoir Python installé sur votre machine. S
     pip install -r requirements.txt
     ```
 
-## Utilisation
+## 🎯 Utilisation
 
 Pour utiliser l'application, exécutez simplement le script principal :
 ```bash
 python main.py
 ```
 
-L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâches.
+L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâches. ✅📅
 
-## Bugs connus
+## 🐞 Bugs connus
 
 - [ ] L'application ne gère pas encore les sous-tâches.
 
-## Évolutions possibles
+## 🌟 Évolutions possibles
 
 - [ ] Ajouter la gestion des sous-tâches.
 - [ ] Implémenter des notifications de rappel fonctionnelles sur toutes les plateformes.
 - [ ] Ajouter une interface graphique pour faciliter l'utilisation.
 - [ ] Permettre la synchronisation des tâches avec un service en ligne.
 
-N'hésitez pas à contribuer à ce projet en soumettant des pull requests ou en ouvrant des issues pour signaler des bugs ou proposer des améliorations.
+N'hésitez pas à contribuer à ce projet en soumettant des pull requests ou en ouvrant des issues pour signaler des bugs ou proposer des améliorations. 🙌
