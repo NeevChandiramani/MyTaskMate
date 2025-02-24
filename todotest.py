@@ -197,7 +197,7 @@ class Todolist:
 
 # Lancer l'application
 if __name__ == "__main__":
-    app = ttk.Window(themename="darkly")  # Appliquez un thème moderne
+    app = ttk.Window(themename="darkly")
     todolist = Todolist(app)
 
     # Démarrer le planificateur de tâches dans un thread séparé
