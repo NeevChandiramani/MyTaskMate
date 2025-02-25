@@ -42,6 +42,9 @@ conn.commit()
 
 # Fonctions pour la gestion des utilisateurs
 def créer_compte(nom_identifiant, mot_de_passe):
+    """str, str -> bool
+    Crée un compte utilisateur dans la base de donnée
+    """
     try:
         cursor.execute('INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)', (nom_identifiant, mot_de_passe))
         conn.commit()
@@ -52,12 +55,18 @@ def créer_compte(nom_identifiant, mot_de_passe):
 
 # La fonction "fetchone()" prend le 1er enregistrement, ici elle vérifie si il y a bien un enregistrement
 def se_connecter(nom_identifiant, mot_de_passe):
+    """str, str -> bool
+    Vérifie si l'utilisateur est enregistré dans la base de donnée
+    """
     cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (nom_identifiant, mot_de_passe))
     return cursor.fetchone() is not None
 
 
 # Fonctions pour la gestion des tâches
 def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
+    """int, str, str, str -> None
+    Ajoute une tâche à la base de donnée
+    """
     cursor.execute('INSERT INTO taches (utilisateur_id, tache, echeance, est_completee, priorité) VALUES (?, ?, ?, ?, ?)',
                    (id_utilisateur, nom_tache, date_echeance, False, prio))
     conn.commit()
