@@ -73,22 +73,34 @@ def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
 
 
 def maj_tache(nom_tache, date_echeance, prio, id_tache):
+    """str, str, str, int -> None
+    Met à jour une tâche existante dans la base de donnée
+    """
     cursor.execute('UPDATE taches SET tache = ?, echeance = ?, priorité = ? WHERE tache_id = ?',
                    (nom_tache, date_echeance, prio, id_tache))
     conn.commit()
 
 
 def supprimer_tache(id_tache):
+    """int -> None
+    Supprime une tâche de la base de donnée
+    """
     cursor.execute('DELETE FROM taches WHERE tache_id = ?', (id_tache,))
     conn.commit()
 
 
 def marquer_tache_complete(id_tache):
+    """int -> None
+    Marque une tâche comme complétée dans la base de donnée
+    """
     cursor.execute('UPDATE taches SET est_completee = TRUE WHERE tache_id = ?', (id_tache,))
     conn.commit()
 
 
 def get_tasks(id_utilisateur):
+    """int -> list
+    Récupère toutes les tâches d'un utilisateur
+    """
     cursor.execute('SELECT * FROM taches WHERE utilisateur_id = ?', (id_utilisateur,))
     return cursor.fetchall()
 
@@ -100,10 +112,15 @@ class Planificateur:
 
 
     def ajouter_tache(self, task):
+        """list -> None
+        Ajoute une tâche à la liste des tâches
+        """
         self.tasks.append(task)
 
 
     def run(self):
+        """Planificateur -> None
+        Vérifie si une tâche est expirée toutes les minutes"""
         while True:
             for task in self.tasks:
                 due_date = datetime.strptime(task[3], '%Y-%m-%d')
@@ -147,6 +164,8 @@ class Todolist:
 
 
     def login(self):
+        """Todolist -> None
+        Vérifie les informations de connexion et affiche la fenêtre principale si les informations sont correctes"""
         identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
         if se_connecter(identifiant, password):
@@ -158,6 +177,8 @@ class Todolist:
 
 
     def créer_compte(self):
+        """Todolist -> None
+        Crée un compte utilisateur et affiche un message de confirmation"""
         identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
         if créer_compte(identifiant, password):
@@ -167,6 +188,9 @@ class Todolist:
 
 
     def show_main_frame(self):
+        """Todolist -> None
+        Affiche la fenêtre principale de l'application
+        """
         self.login_frame.pack_forget()
         self.main_frame = ttk.Frame(self.principale)
         self.main_frame.pack(padx=10, pady=10)
@@ -190,6 +214,8 @@ class Todolist:
 
 
     def refresh_tasks(self):
+        """Todolist -> None
+        Met à jour la liste des tâches affichées dans la fenêtre principale"""
         self.task_listbox.delete(0, tk.END)
         tasks = get_tasks(self.current_user)
         for task in tasks:
@@ -212,6 +238,8 @@ class Todolist:
 
 
     def ajouter_tache(self):
+        """Todolist -> None
+        Affiche une fenêtre pour ajouter une nouvelle tâche"""
         fenetre_tache = tk.Toplevel(principale)
         fenetre_tache.title("Ajouter une tâche")
 
@@ -237,6 +265,8 @@ class Todolist:
 
 
         def enregistrer_tache():
+            """Todolist -> None
+            Enregistre une nouvelle tâche dans la base de donnée"""
             description = description_entry.get()
             due_date = due_date_entry.get()
             priorité = None
@@ -253,6 +283,8 @@ class Todolist:
 
 
         def annuler() :
+            """Todolist -> None
+            Ferme la fenêtre d'ajout de tâche"""
             fenetre_tache.destroy()
 
         boutton_enregistrement = ttk.Button(fenetre_tache, text = "Enregistrer la tâche", command = enregistrer_tache)
@@ -263,6 +295,8 @@ class Todolist:
 
 
     def mark_completed(self):
+        """Todolist -> None
+        Marque une tâche comme complétée dans la base de donnée"""
         tache_selectionnee = self.task_listbox.curselection()
         if not tache_selectionnee:
             messagebox.showwarning("Aucune séléction", "Choisissez une tâche à marquer comme complétée")
@@ -275,6 +309,8 @@ class Todolist:
 
 
     def supprimer_tache(self):
+        """Todolist -> None
+        Supprime une tâche de la base de donnée"""
         tache_selectionnee = self.task_listbox.curselection()
         tache_selectionnee = tache_selectionnee[0]
         tasks = get_tasks(self.current_user)
@@ -284,6 +320,8 @@ class Todolist:
 
 
     def deconnecter(self):
+        """Todolist -> None
+        Déconnecte l'utilisateur et affiche la fenêtre de connexion"""
         self.main_frame.pack_forget()
         self.login_frame.pack()
         self.current_user = None
