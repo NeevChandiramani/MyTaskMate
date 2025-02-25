@@ -29,7 +29,7 @@ cursor.execute('''
 CREATE TABLE IF NOT EXISTS tasks (
     task_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    task_description TEXT NOT NULL,
+    tache TEXT NOT NULL,
     due_date TEXT NOT NULL,
     is_completed BOOLEAN NOT NULL,
     priority TEXT CHECK( priority IN ('low', 'medium', 'high') ) NOT NULL,
@@ -41,9 +41,9 @@ CREATE TABLE IF NOT EXISTS tasks (
 conn.commit()
 
 # Fonctions pour la gestion des utilisateurs
-def créer_compte(identifiant, mdp):
+def créer_compte(nom_identifiant, mot_de_passe):
     try:
-        cursor.execute('INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)', (identifiant, mdp))
+        cursor.execute('INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)', (nom_identifiant, mot_de_passe))
         conn.commit()
         return True
     except sqlite3.IntegrityError:
@@ -51,31 +51,31 @@ def créer_compte(identifiant, mdp):
 
 
 # La fonction "fetchone()" prend le 1er enregistrement, ici elle vérifie si il y a bien un enregistrement
-def se_connecter(identifiant, mdp):
-    cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (identifiant, mdp))
+def se_connecter(nom_identifiant, mot_de_passe):
+    cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (nom_identifiant, mot_de_passe))
     return cursor.fetchone() is not None
 
 
 # Fonctions pour la gestion des tâches
-def ajouter_tache(user_id, description, due_date, priority):
+def ajouter_tache(user_id, nom_tache, date_echeance, prio):
     cursor.execute('INSERT INTO tasks (user_id, task_description, due_date, is_completed, priority) VALUES (?, ?, ?, ?, ?)',
-                   (user_id, description, due_date, False, priority))
+                   (user_id, nom_tache, date_echeance, False, prio))
     conn.commit()
 
 
-def maj_tache(task_id, description, due_date, priority):
+def maj_tache(nom_tache, date_echeance, prio, id_tache):
     cursor.execute('UPDATE tasks SET task_description = ?, due_date = ?, priority = ? WHERE task_id = ?',
-                   (description, due_date, priority, task_id))
+                   (nom_tache, date_echeance, prio, id_tache))
     conn.commit()
 
 
-def supprimer_tache(task_id):
-    cursor.execute('DELETE FROM tasks WHERE task_id = ?', (task_id,))
+def supprimer_tache(id_tache):
+    cursor.execute('DELETE FROM tasks WHERE task_id = ?', (id_tache,))
     conn.commit()
 
 
-def marquer_tache_complete(task_id):
-    cursor.execute('UPDATE tasks SET is_completed = TRUE WHERE task_id = ?', (task_id,))
+def marquer_tache_complete(id_tache):
+    cursor.execute('UPDATE tasks SET is_completed = TRUE WHERE task_id = ?', (id_tache,))
     conn.commit()
 
 
@@ -174,7 +174,7 @@ class Todolist:
         self.complete_button = ttk.Button(self.main_frame, text = "Marquer comme complêtée", command = self.mark_completed)
         self.complete_button.grid(row = 1, column = 1, pady = 5)
 
-        self.deco_button = ttk.Button(self.main_frame, text = "Se déconnecter", command = self.logout)
+        self.deco_button = ttk.Button(self.main_frame, text = "Se déconnecter", command = self.deconnecter)
         self.deco_button.grid(row = 2, column = 1, pady = 5)
 
         self.supprimer_button = ttk.Button(self.main_frame, text ="Supprimer la tâche", command = self.supprimer_tache)
@@ -275,7 +275,7 @@ class Todolist:
         self.refresh_tasks()
 
 
-    def logout(self):
+    def deconnecter(self):
         self.main_frame.pack_forget()
         self.login_frame.pack()
         self.current_user = None
