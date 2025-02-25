@@ -34,13 +34,12 @@ L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâche
 
 ## 🐞 Bugs connus
 
-- [ ] L'application ne gère pas encore les sous-tâches.
+- [ ] XXXXXX
 
 ## 🌟 Évolutions possibles
 
 - [ ] Ajouter la gestion des sous-tâches.
 - [ ] Implémenter des notifications de rappel fonctionnelles sur toutes les plateformes.
-- [ ] Ajouter une interface graphique pour faciliter l'utilisation.
 - [ ] Permettre la synchronisation des tâches avec un service en ligne.
 
 N'hésitez pas à contribuer à ce projet en soumettant des pull requests ou en ouvrant des issues pour signaler des bugs ou proposer des améliorations. 🙌
