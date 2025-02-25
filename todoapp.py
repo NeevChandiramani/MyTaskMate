@@ -9,7 +9,7 @@ import threading
 import time
 
 # La fonction "connect()" permet de se connecter à la base de donnée
-conn = sqlite3.connect('todo_list.db')
+conn = sqlite3.connect('todolist.db')
 
 # La fonction "cursor()"" permet d'intéragir avec la base de donnée et d'utiliser les différentes requêtes SQL
 cursor = conn.cursor()
@@ -17,7 +17,7 @@ cursor = conn.cursor()
 # Création des tables
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS utilisateur (
-    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilisateur_id INTEGER PRIMARY KEY AUTOINCREMENT,
     identifiant TEXT UNIQUE NOT NULL,       
     mdp TEXT NOT NULL
 )
@@ -26,14 +26,14 @@ CREATE TABLE IF NOT EXISTS utilisateur (
 # "NOT NULL" indique que la valeur ne peut pas être nul
 # "AUTOINCREMENT" génère automatiquement une valeur unique pour chaque enregistrement
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS tasks (
-    task_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS taches (
+    tache_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilisateur_id INTEGER NOT NULL,
     tache TEXT NOT NULL,
-    due_date TEXT NOT NULL,
-    is_completed BOOLEAN NOT NULL,
-    priority TEXT CHECK( priority IN ('low', 'medium', 'high') ) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES utilisateur (user_id)
+    echeance TEXT NOT NULL,
+    est_completee BOOLEAN NOT NULL,
+    priorité TEXT CHECK( priorité IN ('Faible', 'Moyenne', 'Haute') ) NOT NULL,
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (utilisateur_id)
 )
 ''')
 
@@ -57,30 +57,30 @@ def se_connecter(nom_identifiant, mot_de_passe):
 
 
 # Fonctions pour la gestion des tâches
-def ajouter_tache(user_id, nom_tache, date_echeance, prio):
-    cursor.execute('INSERT INTO tasks (user_id, task_description, due_date, is_completed, priority) VALUES (?, ?, ?, ?, ?)',
-                   (user_id, nom_tache, date_echeance, False, prio))
+def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
+    cursor.execute('INSERT INTO taches (utilisateur_id, tache, echeance, est_completee, priorité) VALUES (?, ?, ?, ?, ?)',
+                   (id_utilisateur, nom_tache, date_echeance, False, prio))
     conn.commit()
 
 
 def maj_tache(nom_tache, date_echeance, prio, id_tache):
-    cursor.execute('UPDATE tasks SET task_description = ?, due_date = ?, priority = ? WHERE task_id = ?',
+    cursor.execute('UPDATE taches SET tache = ?, echeance = ?, priorité = ? WHERE tache_id = ?',
                    (nom_tache, date_echeance, prio, id_tache))
     conn.commit()
 
 
 def supprimer_tache(id_tache):
-    cursor.execute('DELETE FROM tasks WHERE task_id = ?', (id_tache,))
+    cursor.execute('DELETE FROM taches WHERE tache_id = ?', (id_tache,))
     conn.commit()
 
 
 def marquer_tache_complete(id_tache):
-    cursor.execute('UPDATE tasks SET is_completed = TRUE WHERE task_id = ?', (id_tache,))
+    cursor.execute('UPDATE taches SET est_completee = TRUE WHERE tache_id = ?', (id_tache,))
     conn.commit()
 
 
-def get_tasks(user_id):
-    cursor.execute('SELECT * FROM tasks WHERE user_id = ?', (user_id,))
+def get_tasks(id_utilisateur):
+    cursor.execute('SELECT * FROM taches WHERE utilisateur_id = ?', (id_utilisateur,))
     return cursor.fetchall()
 
 
@@ -115,7 +115,6 @@ class Todolist:
         self.style = ttk.Style()
         self.style.configure("TLabel", font=("Helvetica", 12))
         self.style.configure("TButton", font=("Helvetica", 12))
-        self.style.configure("arrondi.TButton", borderwidth=0, focusthickness=0, focuscolor="None", padding=6, relief="flat", foreground="white", borderradius=10)
 
 
         self.login_frame = ttk.Frame(principale)
@@ -131,7 +130,7 @@ class Todolist:
         self.password_entry = ttk.Entry(self.login_frame, show="*")
         self.password_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login, style = "arrondi.TButton")
+        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login)
         self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
 
         self.créer_compte_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.créer_compte)
@@ -142,7 +141,7 @@ class Todolist:
         identifiant = self.identifiant_entry.get()
         password = self.password_entry.get()
         if se_connecter(identifiant, password):
-            cursor.execute('SELECT user_id FROM utilisateur WHERE identifiant = ?', (identifiant,))
+            cursor.execute('SELECT utilisateur_id FROM utilisateur WHERE identifiant = ?', (identifiant,))
             self.current_user = cursor.fetchone()[0]
             self.show_main_frame()
         else:
@@ -190,13 +189,13 @@ class Todolist:
                 task_text += " - Completed"
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'gray'})
-            elif task[5] == 'low' :
+            elif task[5] == 'Faible' :
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'green'})
-            elif task[5] == 'medium' :
+            elif task[5] == 'Moyenne' :
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'orange'})
-            elif task[5] == 'high':
+            elif task[5] == 'Haute':
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'red'})
             else:
@@ -218,8 +217,8 @@ class Todolist:
         due_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
 
-        priority_label = ttk.Label(fenetre_tache, text="Priorité")
-        priority_label.grid(row=2, column=0, padx=5, pady=5)
+        prio_label = ttk.Label(fenetre_tache, text="Priorité")
+        prio_label.grid(row=2, column=0, padx=5, pady=5)
 
         choix_prio = tk.StringVar()
         combobox = ttk.Combobox(fenetre_tache, textvariable = choix_prio)
@@ -231,15 +230,15 @@ class Todolist:
         def enregistrer_tache():
             description = description_entry.get()
             due_date = due_date_entry.get()
-            priority = None
+            priorité = None
             if choix_prio.get() == 'Faible' :
-                priority = 'low'
+                priorité = 'Faible'
             elif choix_prio.get() == 'Moyenne' :
-                priority = 'medium'
+                priorité = 'Moyenne'
             elif choix_prio.get() == 'Haute' :
-                priority = 'high'
-            if priority is not None :      
-                ajouter_tache(self.current_user, description, due_date, priority)
+                priorité = 'Haute'
+            if priorité is not None :      
+                ajouter_tache(self.current_user, description, due_date, priorité)
                 self.refresh_tasks()
                 fenetre_tache.destroy()
 
