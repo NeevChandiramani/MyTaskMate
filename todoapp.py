@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS taches (
     tache TEXT NOT NULL,
     echeance TEXT NOT NULL,
     est_completee BOOLEAN NOT NULL,
-    priorité TEXT CHECK( priorité IN ('Faible', 'Moyenne', 'Haute') ) NOT NULL,
+    priorite TEXT CHECK( priorite IN ('Faible', 'Moyenne', 'Haute') ) NOT NULL,
     FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (utilisateur_id)
 )
 ''')
@@ -43,8 +43,7 @@ conn.commit()
 # Fonctions pour la gestion des utilisateurs
 def créer_compte(nom_identifiant, mot_de_passe):
     """str, str -> bool
-    Crée un compte utilisateur dans la base de donnée
-    """
+    Crée un compte utilisateur dans la base de donnée"""
     try:
         cursor.execute('INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)', (nom_identifiant, mot_de_passe))
         conn.commit()
@@ -56,8 +55,7 @@ def créer_compte(nom_identifiant, mot_de_passe):
 # La fonction "fetchone()" prend le 1er enregistrement, ici elle vérifie si il y a bien un enregistrement
 def se_connecter(nom_identifiant, mot_de_passe):
     """str, str -> bool
-    Vérifie si l'utilisateur est enregistré dans la base de donnée
-    """
+    Vérifie si l'utilisateur est enregistré dans la base de donnée"""
     cursor.execute('SELECT * FROM utilisateur WHERE identifiant = ? AND mdp = ?', (nom_identifiant, mot_de_passe))
     return cursor.fetchone() is not None
 
@@ -65,42 +63,43 @@ def se_connecter(nom_identifiant, mot_de_passe):
 # Fonctions pour la gestion des tâches
 def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
     """int, str, str, str -> None
-    Ajoute une tâche à la base de donnée
-    """
-    cursor.execute('INSERT INTO taches (utilisateur_id, tache, echeance, est_completee, priorité) VALUES (?, ?, ?, ?, ?)',
+    Ajoute une tâche à la base de donnée"""
+    cursor.execute('INSERT INTO taches (utilisateur_id, tache, echeance, est_completee, priorite) VALUES (?, ?, ?, ?, ?)',
                    (id_utilisateur, nom_tache, date_echeance, False, prio))
     conn.commit()
 
 
 def maj_tache(nom_tache, date_echeance, prio, id_tache):
     """str, str, str, int -> None
-    Met à jour une tâche existante dans la base de donnée
-    """
-    cursor.execute('UPDATE taches SET tache = ?, echeance = ?, priorité = ? WHERE tache_id = ?',
+    Met à jour une tâche existante dans la base de donnée"""
+    cursor.execute('UPDATE taches SET tache = ?, echeance = ?, priorite = ? WHERE tache_id = ?',
                    (nom_tache, date_echeance, prio, id_tache))
     conn.commit()
 
 
+#def modif_prio(prio, id_tache) :
+    #cursor.execute('UPDATE taches set priorite = ? WHERE tache_id = ?',
+#                   (prio, id_tache))
+    #conn.commit()
+
+
 def supprimer_tache(id_tache):
     """int -> None
-    Supprime une tâche de la base de donnée
-    """
+    Supprime une tâche de la base de donnée"""
     cursor.execute('DELETE FROM taches WHERE tache_id = ?', (id_tache,))
     conn.commit()
 
 
 def marquer_tache_complete(id_tache):
     """int -> None
-    Marque une tâche comme complétée dans la base de donnée
-    """
+    Marque une tâche comme complétée dans la base de donnée"""
     cursor.execute('UPDATE taches SET est_completee = TRUE WHERE tache_id = ?', (id_tache,))
     conn.commit()
 
 
 def get_tasks(id_utilisateur):
     """int -> list
-    Récupère toutes les tâches d'un utilisateur
-    """
+    Récupère toutes les tâches d'un utilisateur"""
     cursor.execute('SELECT * FROM taches WHERE utilisateur_id = ?', (id_utilisateur,))
     return cursor.fetchall()
 
@@ -113,8 +112,7 @@ class Planificateur:
 
     def ajouter_tache(self, task):
         """list -> None
-        Ajoute une tâche à la liste des tâches
-        """
+        Ajoute une tâche à la liste des tâches"""
         self.tasks.append(task)
 
 
@@ -189,8 +187,7 @@ class Todolist:
 
     def show_main_frame(self):
         """Todolist -> None
-        Affiche la fenêtre principale de l'application
-        """
+        Affiche la fenêtre principale de l'application"""
         self.login_frame.pack_forget()
         self.main_frame = ttk.Frame(self.principale)
         self.main_frame.pack(padx=10, pady=10)
@@ -253,7 +250,6 @@ class Todolist:
         due_date_entry = ttk.Entry(fenetre_tache)
         due_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
-
         prio_label = ttk.Label(fenetre_tache, text="Priorité")
         prio_label.grid(row=2, column=0, padx=5, pady=5)
 
@@ -269,15 +265,15 @@ class Todolist:
             Enregistre une nouvelle tâche dans la base de donnée"""
             description = description_entry.get()
             due_date = due_date_entry.get()
-            priorité = None
+            priorite = None
             if choix_prio.get() == 'Faible' :
-                priorité = 'Faible'
+                priorite = 'Faible'
             elif choix_prio.get() == 'Moyenne' :
-                priorité = 'Moyenne'
+                priorite = 'Moyenne'
             elif choix_prio.get() == 'Haute' :
-                priorité = 'Haute'
-            if priorité is not None :      
-                ajouter_tache(self.current_user, description, due_date, priorité)
+                priorite = 'Haute'
+            if priorite is not None :      
+                ajouter_tache(self.current_user, description, due_date, priorite)
                 self.refresh_tasks()
                 fenetre_tache.destroy()
 
