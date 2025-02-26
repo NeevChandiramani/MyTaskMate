@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS taches (
     tache_id INTEGER PRIMARY KEY AUTOINCREMENT,
     utilisateur_id INTEGER NOT NULL,
     tache TEXT NOT NULL,
+    description TEXTE,
     echeance TEXT NOT NULL,
     est_completee BOOLEAN NOT NULL,
     priorite TEXT CHECK( priorite IN ('Faible', 'Moyenne', 'Haute') ) NOT NULL,
@@ -69,18 +70,12 @@ def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
     conn.commit()
 
 
-def maj_tache(nom_tache, date_echeance, prio, id_tache):
+def maj_tache(description_tache, prio, id_tache):
     """str, str, str, int -> None
     Met à jour une tâche existante dans la base de donnée"""
-    cursor.execute('UPDATE taches SET tache = ?, echeance = ?, priorite = ? WHERE tache_id = ?',
-                   (nom_tache, date_echeance, prio, id_tache))
+    cursor.execute('UPDATE taches SET description = ?, priorite = ? WHERE tache_id = ?',
+                   (description_tache, prio, id_tache))
     conn.commit()
-
-
-#def modif_prio(prio, id_tache) :
-    #cursor.execute('UPDATE taches set priorite = ? WHERE tache_id = ?',
-#                   (prio, id_tache))
-    #conn.commit()
 
 
 def supprimer_tache(id_tache):
@@ -121,7 +116,7 @@ class Planificateur:
         Vérifie si une tâche est expirée toutes les minutes"""
         while True:
             for task in self.tasks:
-                due_date = datetime.strptime(task[3], '%Y-%m-%d')
+                due_date = datetime.strptime(task[4], '%Y-%m-%d')
                 if datetime.now() > due_date and not task[4]:
                     print(f"La tâche {task[2]} est expirée!")
             # Vérifie toutes les minutes avec le time.sleep
@@ -197,7 +192,7 @@ class Todolist:
 
         self.refresh_tasks()
 
-        self.ajouter_tache_button = ttk.Button(self.main_frame, text="Ajouter une tâche", command = self.ajouter_tache)
+        self.ajouter_tache_button = ttk.Button(self.main_frame, text = "Ajouter une tâche", command = self.ajouter_tache)
         self.ajouter_tache_button.grid(row=1, column=0, pady=5)
 
         self.complete_button = ttk.Button(self.main_frame, text = "Marquer comme complêtée", command = self.mark_completed)
@@ -206,8 +201,11 @@ class Todolist:
         self.deco_button = ttk.Button(self.main_frame, text = "Se déconnecter", command = self.deconnecter)
         self.deco_button.grid(row = 2, column = 1, pady = 5)
 
-        self.supprimer_button = ttk.Button(self.main_frame, text ="Supprimer la tâche", command = self.supprimer_tache)
+        self.supprimer_button = ttk.Button(self.main_frame, text = "Supprimer la tâche", command = self.supprimer_tache)
         self.supprimer_button.grid(row = 2, column = 0, pady = 5)
+
+        self.modifier_tache_button = ttk.Button(self.main_frame, text = "Modifier la tâche", command = self.modif_tache)
+        self.modifier_tache_button.grid(row = 3, column = 0, pady = 5)
 
 
     def refresh_tasks(self):
@@ -216,34 +214,34 @@ class Todolist:
         self.task_listbox.delete(0, tk.END)
         tasks = get_tasks(self.current_user)
         for task in tasks:
-            task_text = f"{task[2]} - Échéance: {task[3]} - Priorité: {task[5]}"
-            if task[4]:
+            task_text = f"{task[2]} - Échéance: {task[4]} - Priorité: {task[6]}"
+            if task[5]:
                 task_text += " - Completed"
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'gray'})
-            elif task[5] == 'Faible' :
+            elif task[6] == 'Faible' :
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'green'})
-            elif task[5] == 'Moyenne' :
+            elif task[6] == 'Moyenne' :
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'orange'})
-            elif task[5] == 'Haute':
+            elif task[6] == 'Haute':
                 self.task_listbox.insert(tk.END, task_text)
                 self.task_listbox.itemconfig(tk.END, {'fg': 'red'})
             else:
                 self.task_listbox.insert(tk.END, task_text)
 
 
-    def ajouter_tache(self):
+    def ajouter_tache(self) :
         """Todolist -> None
         Affiche une fenêtre pour ajouter une nouvelle tâche"""
         fenetre_tache = tk.Toplevel(principale)
         fenetre_tache.title("Ajouter une tâche")
 
-        description_label = ttk.Label(fenetre_tache, text="Nom de la tâche")
-        description_label.grid(row=0, column=0, padx=5, pady=5)
-        description_entry = ttk.Entry(fenetre_tache)
-        description_entry.grid(row=0, column=1, padx=5, pady=5)
+        nom_tache_label = ttk.Label(fenetre_tache, text="Nom de la tâche")
+        nom_tache_label.grid(row=0, column=0, padx=5, pady=5)
+        nom_tache_entry = ttk.Entry(fenetre_tache)
+        nom_tache_entry.grid(row=0, column=1, padx=5, pady=5)
 
         due_date_label = ttk.Label(fenetre_tache, text="Date limite (JJ-MM-AAAA)")
         due_date_label.grid(row=1, column=0, padx=5, pady=5)
@@ -254,28 +252,28 @@ class Todolist:
         prio_label.grid(row=2, column=0, padx=5, pady=5)
 
         choix_prio = tk.StringVar()
-        combobox = ttk.Combobox(fenetre_tache, textvariable = choix_prio)
-        combobox['values'] = ("Faible", "Moyenne", "Haute")
-        combobox.bind('Séléction', choix_prio.get())
-        combobox.grid(row = 2, column = 1, padx = 5, pady = 5)
+        prio_combobox = ttk.Combobox(fenetre_tache, textvariable = choix_prio)
+        prio_combobox['values'] = ("Faible", "Moyenne", "Haute")
+        prio_combobox.bind('Séléction', choix_prio.get())
+        prio_combobox.grid(row = 2, column = 1, padx = 5, pady = 5)
 
 
-        def enregistrer_tache():
+        def enregistrer_tache() :
             """Todolist -> None
             Enregistre une nouvelle tâche dans la base de donnée"""
-            description = description_entry.get()
+            nom_tache = nom_tache_entry.get()
             due_date = due_date_entry.get()
-            priorite = None
-            if choix_prio.get() == 'Faible' :
-                priorite = 'Faible'
-            elif choix_prio.get() == 'Moyenne' :
-                priorite = 'Moyenne'
-            elif choix_prio.get() == 'Haute' :
-                priorite = 'Haute'
-            if priorite is not None :      
-                ajouter_tache(self.current_user, description, due_date, priorite)
-                self.refresh_tasks()
-                fenetre_tache.destroy()
+            priorite = choix_prio.get()
+            #if choix_prio.get() == 'Faible' :
+                #priorite = 'Faible'
+            #elif choix_prio.get() == 'Moyenne' :
+                #priorite = 'Moyenne'
+            #elif choix_prio.get() == 'Haute' :
+                #priorite = 'Haute'
+            #if priorite is not None :      
+            ajouter_tache(self.current_user, nom_tache, due_date, priorite)
+            self.refresh_tasks()
+            fenetre_tache.destroy()
 
 
         def annuler() :
@@ -288,6 +286,52 @@ class Todolist:
 
         boutton_annuler = ttk.Button(fenetre_tache, text = "Annuler", command = annuler)
         boutton_annuler.grid(row = 3, column = 0, pady = 5)
+    
+
+    def modif_tache(self) :
+
+        tache_selectionnee = self.task_listbox.curselection()
+        if not tache_selectionnee:
+            messagebox.showwarning("Aucune séléction", "Choisissez une tâche à modifier")
+            return
+
+        fenetre_modif = tk.Toplevel(principale)
+        fenetre_modif.title("Modifier une tâche")
+
+        description_label = ttk.Label(fenetre_modif, text = "Description de la tâche :")
+        description_label.grid(row = 0, column = 0, pady = 5)
+        description_entree = ttk.Entry(fenetre_modif)
+        description_entree.grid(row = 1, rowspan = 3, column = 0, columnspan = 4, padx = 5, pady = 5)
+
+        modif_prio_label= ttk.Label(fenetre_modif, text = "Priorité")
+        modif_prio_label.grid(row = 4, column = 0, pady = 5)
+        
+        modif_prio = tk.StringVar()
+        modif_prio_combobox = ttk.Combobox(fenetre_modif, textvariable = modif_prio)
+        modif_prio_combobox['values'] = ("Faible", "Moyenne", "Haute")
+        modif_prio_combobox.bind('Séléction', modif_prio.get())
+        modif_prio_combobox.grid(row = 4, column = 1, padx = 5, pady = 5)
+
+
+        def enregistrer_modif() :
+            description = description_entree.get()
+            priorite = modif_prio.get()
+            tache_selectionnee = self.task_listbox.curselection()
+            tasks = get_tasks(self.current_user)
+            task_id = tasks[tache_selectionnee][0]
+            maj_tache(description, priorite, task_id)
+            self.refresh_tasks()
+            fenetre_modif.destroy()
+
+
+        def annuler_modif() :
+            fenetre_modif.destroy()
+
+        boutton_enregistrement = ttk.Button(fenetre_modif, text = "Enregistrer la tâche", command = enregistrer_modif)
+        boutton_enregistrement.grid(row = 5, column = 1, pady = 5, padx = 5)
+
+        boutton_annuler = ttk.Button(fenetre_modif, text = "Annuler", command = annuler_modif)
+        boutton_annuler.grid(row = 5, column = 0, pady = 5, padx = 5)
 
 
     def mark_completed(self):
@@ -308,6 +352,9 @@ class Todolist:
         """Todolist -> None
         Supprime une tâche de la base de donnée"""
         tache_selectionnee = self.task_listbox.curselection()
+        if not tache_selectionnee:
+            messagebox.showwarning("Aucune séléction", "Choisissez une tâche à supprimer")
+            return
         tache_selectionnee = tache_selectionnee[0]
         tasks = get_tasks(self.current_user)
         task_id = tasks[tache_selectionnee][0]
