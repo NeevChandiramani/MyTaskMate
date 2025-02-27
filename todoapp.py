@@ -127,7 +127,7 @@ class Planificateur:
 class Todolist:
     def __init__(self, principale):
         self.principale = principale
-        self.principale.title("To do list tg3 code créa michoucroute dans la boutique les gars")
+        self.principale.title("La todo list de M. Picard")
         self.utilisateur_actuel = None
 
         self.style = ttk.Style()
