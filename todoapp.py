@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS taches (
 conn.commit()
 
 # Fonctions pour la gestion des utilisateurs
-def créer_compte(nom_identifiant, mot_de_passe):
+def nouveau_compte(nom_identifiant, mot_de_passe):
     """str, str -> bool
     Crée un compte utilisateur dans la base de donnée"""
     try:
@@ -70,11 +70,11 @@ def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
     conn.commit()
 
 
-def maj_tache(description_tache, prio, id_tache):
+def maj_tache(description_tache, prio, nom_tache):
     """str, str, str, int -> None
     Met à jour une tâche existante dans la base de donnée"""
-    cursor.execute('UPDATE taches SET description = ?, priorite = ? WHERE tache_id = ?',
-                   (description_tache, prio, id_tache))
+    cursor.execute('UPDATE taches SET description = ?, priorite = ? WHERE tache = ?',
+                   (description_tache, prio, nom_tache))
     conn.commit()
 
 
@@ -92,7 +92,7 @@ def marquer_tache_complete(id_tache):
     conn.commit()
 
 
-def get_tasks(id_utilisateur):
+def obtenir_taches(id_utilisateur):
     """int -> list
     Récupère toutes les tâches d'un utilisateur"""
     cursor.execute('SELECT * FROM taches WHERE utilisateur_id = ?', (id_utilisateur,))
@@ -102,23 +102,23 @@ def get_tasks(id_utilisateur):
 # Classe d'ordonnancement pour gérer les états des tâches
 class Planificateur:
     def __init__(self):
-        self.tasks = []
+        self.taches = []
 
 
     def ajouter_tache(self, task):
         """list -> None
         Ajoute une tâche à la liste des tâches"""
-        self.tasks.append(task)
+        self.taches.append(task)
 
 
     def run(self):
         """Planificateur -> None
         Vérifie si une tâche est expirée toutes les minutes"""
         while True:
-            for task in self.tasks:
-                due_date = datetime.strptime(task[4], '%Y-%m-%d')
-                if datetime.now() > due_date and not task[4]:
-                    print(f"La tâche {task[2]} est expirée!")
+            for tache in self.taches:
+                echeance = datetime.strptime(tache[4], '%Y-%m-%d')
+                if datetime.now() > echeance and not tache[4]:
+                    messagebox.showerror("La tâche a expiré")
             # Vérifie toutes les minutes avec le time.sleep
             time.sleep(60)
 
@@ -129,42 +129,42 @@ class Todolist:
     def __init__(self, principale):
         self.principale = principale
         self.principale.title("To do list tg3 code créa michoucroute dans la boutique les gars")
-        self.current_user = None
+        self.utilisateur_actuel = None
 
         self.style = ttk.Style()
         self.style.configure("TLabel", font=("Helvetica", 12))
         self.style.configure("TButton", font=("Helvetica", 12))
 
 
-        self.login_frame = ttk.Frame(principale)
-        self.login_frame.pack(padx=10, pady=10)
+        self.fenetre_connexion = ttk.Frame(principale)
+        self.fenetre_connexion.pack(padx=10, pady=10)
 
-        self.identifiant_label = ttk.Label(self.login_frame, text="Identifiant")
+        self.identifiant_label = ttk.Label(self.fenetre_connexion, text="Identifiant")
         self.identifiant_label.grid(row=0, column=0, padx=5, pady=5)
-        self.identifiant_entry = ttk.Entry(self.login_frame)
+        self.identifiant_entry = ttk.Entry(self.fenetre_connexion)
         self.identifiant_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        self.password_label = ttk.Label(self.login_frame, text="Mot de passe")
-        self.password_label.grid(row=1, column=0, padx=5, pady=5)
-        self.password_entry = ttk.Entry(self.login_frame, show="*")
-        self.password_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.mdp_label = ttk.Label(self.fenetre_connexion, text="Mot de passe")
+        self.mdp_label.grid(row=1, column=0, padx=5, pady=5)
+        self.mdp_entry = ttk.Entry(self.fenetre_connexion, show="*")
+        self.mdp_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        self.login_button = ttk.Button(self.login_frame, text="Se connecter", command=self.login)
-        self.login_button.grid(row=2, column=0, columnspan=2, pady=10)
+        self.connexion_button = ttk.Button(self.fenetre_connexion, text="Se connecter", command=self.connexion)
+        self.connexion_button.grid(row=2, column=0, columnspan=2, pady=10)
 
-        self.créer_compte_button = ttk.Button(self.login_frame, text="Créer un compte", command=self.créer_compte)
-        self.créer_compte_button.grid(row=3, column=0, columnspan=2, pady=10)
+        self.creer_compte_button = ttk.Button(self.fenetre_connexion, text="Créer un compte", command=self.créer_compte)
+        self.creer_compte_button.grid(row=3, column=0, columnspan=2, pady=10)
 
 
-    def login(self):
+    def connexion(self):
         """Todolist -> None
         Vérifie les informations de connexion et affiche la fenêtre principale si les informations sont correctes"""
         identifiant = self.identifiant_entry.get()
-        password = self.password_entry.get()
-        if se_connecter(identifiant, password):
+        mdp = self.mdp_entry.get()
+        if se_connecter(identifiant, mdp):
             cursor.execute('SELECT utilisateur_id FROM utilisateur WHERE identifiant = ?', (identifiant,))
-            self.current_user = cursor.fetchone()[0]
-            self.show_main_frame()
+            self.utilisateur_actuel = cursor.fetchone()[0]
+            self.montrer_fenetre_principale()
         else:
             messagebox.showerror("Connection échouée", "L'identifiant ou le mot de passe est incorrect")
 
@@ -173,63 +173,63 @@ class Todolist:
         """Todolist -> None
         Crée un compte utilisateur et affiche un message de confirmation"""
         identifiant = self.identifiant_entry.get()
-        password = self.password_entry.get()
-        if créer_compte(identifiant, password):
+        mdp = self.mdp_entry.get()
+        if nouveau_compte(identifiant, mdp):
             messagebox.showinfo("Compte créé", "Votre compte a été créé avec succès")
         else:
             messagebox.showerror("Création échouée", "L'identifiant est déjà enregistré")
 
 
-    def show_main_frame(self):
+    def montrer_fenetre_principale(self):
         """Todolist -> None
         Affiche la fenêtre principale de l'application"""
-        self.login_frame.pack_forget()
-        self.main_frame = ttk.Frame(self.principale)
-        self.main_frame.pack(padx=10, pady=10)
+        self.fenetre_connexion.pack_forget()
+        self.fenetre_princiaple = ttk.Frame(self.principale)
+        self.fenetre_princiaple.pack(padx=10, pady=10)
 
-        self.task_listbox = tk.Listbox(self.main_frame, height=15, width=50, font=("Helvetica", 12))
-        self.task_listbox.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
+        self.taches_listbox = tk.Listbox(self.fenetre_princiaple, height=15, width=50, font=("Helvetica", 12))
+        self.taches_listbox.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
-        self.refresh_tasks()
+        self.rafraichir_taches()
 
-        self.ajouter_tache_button = ttk.Button(self.main_frame, text = "Ajouter une tâche", command = self.ajouter_tache)
+        self.ajouter_tache_button = ttk.Button(self.fenetre_princiaple, text = "Ajouter une tâche", command = self.ajouter_tache)
         self.ajouter_tache_button.grid(row=1, column=0, pady=5)
 
-        self.complete_button = ttk.Button(self.main_frame, text = "Marquer comme complêtée", command = self.mark_completed)
-        self.complete_button.grid(row = 1, column = 1, pady = 5)
+        self.completer_button = ttk.Button(self.fenetre_princiaple, text = "Marquer comme complêtée", command = self.marquer_completee)
+        self.completer_button.grid(row = 1, column = 1, pady = 5)
 
-        self.deco_button = ttk.Button(self.main_frame, text = "Se déconnecter", command = self.deconnecter)
+        self.deco_button = ttk.Button(self.fenetre_princiaple, text = "Se déconnecter", command = self.deconnecter)
         self.deco_button.grid(row = 2, column = 1, pady = 5)
 
-        self.supprimer_button = ttk.Button(self.main_frame, text = "Supprimer la tâche", command = self.supprimer_tache)
+        self.supprimer_button = ttk.Button(self.fenetre_princiaple, text = "Supprimer la tâche", command = self.supprimer_tache)
         self.supprimer_button.grid(row = 2, column = 0, pady = 5)
 
-        self.modifier_tache_button = ttk.Button(self.main_frame, text = "Modifier la tâche", command = self.modif_tache)
-        self.modifier_tache_button.grid(row = 3, column = 0, pady = 5)
+        # self.modifier_tache_button = ttk.Button(self.fenetre_princiaple, text = "Modifier la tâche", command = self.modif_tache)
+        # self.modifier_tache_button.grid(row = 3, column = 0, pady = 5)
 
 
-    def refresh_tasks(self):
+    def rafraichir_taches(self):
         """Todolist -> None
         Met à jour la liste des tâches affichées dans la fenêtre principale"""
-        self.task_listbox.delete(0, tk.END)
-        tasks = get_tasks(self.current_user)
-        for task in tasks:
-            task_text = f"{task[2]} - Échéance: {task[4]} - Priorité: {task[6]}"
-            if task[5]:
-                task_text += " - Completed"
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'gray'})
-            elif task[6] == 'Faible' :
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'green'})
-            elif task[6] == 'Moyenne' :
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'orange'})
-            elif task[6] == 'Haute':
-                self.task_listbox.insert(tk.END, task_text)
-                self.task_listbox.itemconfig(tk.END, {'fg': 'red'})
+        self.taches_listbox.delete(0, tk.END)
+        taches = obtenir_taches(self.utilisateur_actuel)
+        for tache in taches:
+            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité: {tache[6]}"
+            if tache[5]:
+                text_tache += " - Completed"
+                self.taches_listbox.insert(tk.END, text_tache)
+                self.taches_listbox.itemconfig(tk.END, {'fg': 'gray'})
+            elif tache[6] == 'Faible' :
+                self.taches_listbox.insert(tk.END, text_tache)
+                self.taches_listbox.itemconfig(tk.END, {'fg': 'green'})
+            elif tache[6] == 'Moyenne' :
+                self.taches_listbox.insert(tk.END, text_tache)
+                self.taches_listbox.itemconfig(tk.END, {'fg': 'orange'})
+            elif tache[6] == 'Haute':
+                self.taches_listbox.insert(tk.END, text_tache)
+                self.taches_listbox.itemconfig(tk.END, {'fg': 'red'})
             else:
-                self.task_listbox.insert(tk.END, task_text)
+                self.taches_listbox.insert(tk.END, text_tache)
 
 
     def ajouter_tache(self) :
@@ -243,10 +243,10 @@ class Todolist:
         nom_tache_entry = ttk.Entry(fenetre_tache)
         nom_tache_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        due_date_label = ttk.Label(fenetre_tache, text="Date limite (JJ-MM-AAAA)")
-        due_date_label.grid(row=1, column=0, padx=5, pady=5)
-        due_date_entry = ttk.Entry(fenetre_tache)
-        due_date_entry.grid(row=1, column=1, padx=5, pady=5)
+        echeance_label = ttk.Label(fenetre_tache, text="Date limite (JJ-MM-AAAA)")
+        echeance_label.grid(row=1, column=0, padx=5, pady=5)
+        echeance_entry = ttk.Entry(fenetre_tache)
+        echeance_entry.grid(row=1, column=1, padx=5, pady=5)
 
         prio_label = ttk.Label(fenetre_tache, text="Priorité")
         prio_label.grid(row=2, column=0, padx=5, pady=5)
@@ -262,17 +262,10 @@ class Todolist:
             """Todolist -> None
             Enregistre une nouvelle tâche dans la base de donnée"""
             nom_tache = nom_tache_entry.get()
-            due_date = due_date_entry.get()
+            echeance = echeance_entry.get()
             priorite = choix_prio.get()
-            #if choix_prio.get() == 'Faible' :
-                #priorite = 'Faible'
-            #elif choix_prio.get() == 'Moyenne' :
-                #priorite = 'Moyenne'
-            #elif choix_prio.get() == 'Haute' :
-                #priorite = 'Haute'
-            #if priorite is not None :      
-            ajouter_tache(self.current_user, nom_tache, due_date, priorite)
-            self.refresh_tasks()
+            ajouter_tache(self.utilisateur_actuel, nom_tache, echeance, priorite)
+            self.rafraichir_taches()
             fenetre_tache.destroy()
 
 
@@ -288,86 +281,86 @@ class Todolist:
         boutton_annuler.grid(row = 3, column = 0, pady = 5)
     
 
-    def modif_tache(self) :
+    # def modif_tache(self) :
 
-        tache_selectionnee = self.task_listbox.curselection()
-        if not tache_selectionnee:
-            messagebox.showwarning("Aucune séléction", "Choisissez une tâche à modifier")
-            return
+    #     tache_selectionnee = self.taches_listbox.curselection()
 
-        fenetre_modif = tk.Toplevel(principale)
-        fenetre_modif.title("Modifier une tâche")
+    #     if tache_selectionnee:
+    #         tache_id = tache_selectionnee[0]
+    #         tache_enregistree = tache_id
+    #     else:
+    #         messagebox.showwarning("Aucune sélection", "Choisissez une tâche à modifier")
 
-        description_label = ttk.Label(fenetre_modif, text = "Description de la tâche :")
-        description_label.grid(row = 0, column = 0, pady = 5)
-        description_entree = ttk.Entry(fenetre_modif)
-        description_entree.grid(row = 1, rowspan = 3, column = 0, columnspan = 4, padx = 5, pady = 5)
+    #     fenetre_modif = tk.Toplevel(principale)
+    #     fenetre_modif.title("Modifier une tâche")
 
-        modif_prio_label= ttk.Label(fenetre_modif, text = "Priorité")
-        modif_prio_label.grid(row = 4, column = 0, pady = 5)
+    #     description_label = ttk.Label(fenetre_modif, text = "Description de la tâche :")
+    #     description_label.grid(row = 0, column = 0, pady = 5)
+    #     description_entree = ttk.Entry(fenetre_modif)
+    #     description_entree.grid(row = 1, rowspan = 3, column = 0, columnspan = 4, padx = 5, pady = 5)
+
+    #     modif_prio_label= ttk.Label(fenetre_modif, text = "Priorité")
+    #     modif_prio_label.grid(row = 4, column = 0, pady = 5)
         
-        modif_prio = tk.StringVar()
-        modif_prio_combobox = ttk.Combobox(fenetre_modif, textvariable = modif_prio)
-        modif_prio_combobox['values'] = ("Faible", "Moyenne", "Haute")
-        modif_prio_combobox.bind('Séléction', modif_prio.get())
-        modif_prio_combobox.grid(row = 4, column = 1, padx = 5, pady = 5)
+    #     modif_prio = tk.StringVar()
+    #     modif_prio_combobox = ttk.Combobox(fenetre_modif, textvariable = modif_prio)
+    #     modif_prio_combobox['values'] = ("Faible", "Moyenne", "Haute")
+    #     modif_prio_combobox.bind('Séléction', modif_prio.get())
+    #     modif_prio_combobox.grid(row = 4, column = 1, padx = 5, pady = 5)
 
 
-        def enregistrer_modif() :
-            description = description_entree.get()
-            priorite = modif_prio.get()
-            tache_selectionnee = self.task_listbox.curselection()
-            tasks = get_tasks(self.current_user)
-            task_id = tasks[tache_selectionnee][0]
-            maj_tache(description, priorite, task_id)
-            self.refresh_tasks()
-            fenetre_modif.destroy()
+    #     def enregistrer_modif() :
+    #         description = description_entree.get()
+    #         priorite = modif_prio.get()
+    #         maj_tache(description, priorite, tache_enregistree)
+    #         self.rafraichir_taches()
+    #         fenetre_modif.destroy()
 
 
-        def annuler_modif() :
-            fenetre_modif.destroy()
+    #     def annuler_modif() :
+    #         fenetre_modif.destroy()
 
-        boutton_enregistrement = ttk.Button(fenetre_modif, text = "Enregistrer la tâche", command = enregistrer_modif)
-        boutton_enregistrement.grid(row = 5, column = 1, pady = 5, padx = 5)
+    #     boutton_enregistrement = ttk.Button(fenetre_modif, text = "Enregistrer la tâche", command = enregistrer_modif)
+    #     boutton_enregistrement.grid(row = 5, column = 1, pady = 5, padx = 5)
 
-        boutton_annuler = ttk.Button(fenetre_modif, text = "Annuler", command = annuler_modif)
-        boutton_annuler.grid(row = 5, column = 0, pady = 5, padx = 5)
+    #     boutton_annuler = ttk.Button(fenetre_modif, text = "Annuler", command = annuler_modif)
+    #     boutton_annuler.grid(row = 5, column = 0, pady = 5, padx = 5)
 
 
-    def mark_completed(self):
+    def marquer_completee(self):
         """Todolist -> None
         Marque une tâche comme complétée dans la base de donnée"""
-        tache_selectionnee = self.task_listbox.curselection()
+        tache_selectionnee = self.taches_listbox.curselection()
         if not tache_selectionnee:
             messagebox.showwarning("Aucune séléction", "Choisissez une tâche à marquer comme complétée")
             return
         tache_selectionnee = tache_selectionnee[0]
-        tasks = get_tasks(self.current_user)
-        task_id = tasks[tache_selectionnee][0]
-        marquer_tache_complete(task_id)
-        self.refresh_tasks()
+        taches = obtenir_taches(self.utilisateur_actuel)
+        tache_id = taches[tache_selectionnee][0]
+        marquer_tache_complete(tache_id)
+        self.rafraichir_taches()
 
 
     def supprimer_tache(self):
         """Todolist -> None
         Supprime une tâche de la base de donnée"""
-        tache_selectionnee = self.task_listbox.curselection()
+        tache_selectionnee = self.taches_listbox.curselection()
         if not tache_selectionnee:
             messagebox.showwarning("Aucune séléction", "Choisissez une tâche à supprimer")
             return
         tache_selectionnee = tache_selectionnee[0]
-        tasks = get_tasks(self.current_user)
-        task_id = tasks[tache_selectionnee][0]
-        supprimer_tache(task_id)
-        self.refresh_tasks()
+        taches = obtenir_taches(self.utilisateur_actuel)
+        tache_id = taches[tache_selectionnee][0]
+        supprimer_tache(tache_id)
+        self.rafraichir_taches()
 
 
     def deconnecter(self):
         """Todolist -> None
         Déconnecte l'utilisateur et affiche la fenêtre de connexion"""
-        self.main_frame.pack_forget()
-        self.login_frame.pack()
-        self.current_user = None
+        self.fenetre_princiaple.pack_forget()
+        self.fenetre_connexion.pack()
+        self.utilisateur_actuel = None
 
 # Lancer l'application
 if __name__ == "__main__":
