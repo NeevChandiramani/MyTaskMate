@@ -214,7 +214,7 @@ class Todolist:
         self.taches_listbox.delete(0, tk.END)
         taches = obtenir_taches(self.utilisateur_actuel)
         for tache in taches:
-            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité (menu déroulant): {tache[6]}"
+            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité: {tache[6]}"
             if tache[5]:
                 text_tache += " - Completed"
                 self.taches_listbox.insert(tk.END, text_tache)
@@ -299,7 +299,7 @@ class Todolist:
     #     description_entree = ttk.Entry(fenetre_modif)
     #     description_entree.grid(row = 1, rowspan = 3, column = 0, columnspan = 4, padx = 5, pady = 5)
 
-    #     modif_prio_label= ttk.Label(fenetre_modif, text = "Priorité")
+    #     modif_prio_label= ttk.Label(fenetre_modif, text = "Priorité (menu déroulant)")
     #     modif_prio_label.grid(row = 4, column = 0, pady = 5)
         
     #     modif_prio = tk.StringVar()
