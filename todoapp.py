@@ -99,6 +99,7 @@ def obtenir_taches(id_utilisateur):
     return cursor.fetchall()
 
 
+
 # Classe d'ordonnancement pour gérer les états des tâches
 class Planificateur:
     def __init__(self):
@@ -134,7 +135,6 @@ class Todolist:
         self.style = ttk.Style()
         self.style.configure("TLabel", font=("Helvetica", 12))
         self.style.configure("TButton", font=("Helvetica", 12))
-
 
         self.fenetre_connexion = ttk.Frame(principale)
         self.fenetre_connexion.pack(padx=10, pady=10)
@@ -288,10 +288,6 @@ class Todolist:
         boutton_annuler.grid(row = 4, column = 0, pady = 5)
     
     
-    
-    
-    
-    
     # def modif_tache(self) :
     #     tache_selectionnee = self.taches_listbox.curselection()
     #     if tache_selectionnee:
@@ -317,14 +313,12 @@ class Todolist:
     #     modif_prio_combobox.bind('Séléction', modif_prio.get())
     #     modif_prio_combobox.grid(row = 4, column = 1, padx = 5, pady = 5)
 
-
     #     def enregistrer_modif() :
     #         description = description_entree.get()
     #         priorite = modif_prio.get()
     #         maj_tache(description, priorite, tache_enregistree)
     #         self.rafraichir_taches()
     #         fenetre_modif.destroy()
-
 
     #     def annuler_modif() :
     #         fenetre_modif.destroy()
@@ -396,6 +390,7 @@ class Todolist:
         self.fenetre_principale.pack_forget()
         self.fenetre_connexion.pack()
         self.utilisateur_actuel = None
+
 
 # Lancer l'application
 if __name__ == "__main__":
