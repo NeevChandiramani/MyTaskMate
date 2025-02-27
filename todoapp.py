@@ -169,7 +169,7 @@ class Todolist:
             messagebox.showerror("Connection échouée", "L'identifiant ou le mot de passe est incorrect")
 
 
-    def creer_compte(self):
+    def créer_compte(self):
         """Todolist -> None
         Crée un compte utilisateur et affiche un message de confirmation"""
         identifiant = self.identifiant_entry.get()
