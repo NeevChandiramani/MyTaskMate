@@ -34,7 +34,7 @@ L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâche
 
 ## 🐞 Bugs connus
 
-- [ ] XXXXXX
+- [ ] XXXXXXXX
 
 ## 🌟 Évolutions possibles
 
