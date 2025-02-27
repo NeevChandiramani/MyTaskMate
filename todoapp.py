@@ -214,7 +214,7 @@ class Todolist:
         self.taches_listbox.delete(0, tk.END)
         taches = obtenir_taches(self.utilisateur_actuel)
         for tache in taches:
-            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité: {tache[6]}"
+            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité (menu déroulant): {tache[6]}"
             if tache[5]:
                 text_tache += " - Completed"
                 self.taches_listbox.insert(tk.END, text_tache)
