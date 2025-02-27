@@ -69,7 +69,6 @@ def ajouter_tache(id_utilisateur, nom_tache, date_echeance, prio):
                    (id_utilisateur, nom_tache, date_echeance, False, prio))
     conn.commit()
 
-
 def maj_tache(description_tache, prio, nom_tache):
     """str, str, str, int -> None
     Met à jour une tâche existante dans la base de donnée"""
