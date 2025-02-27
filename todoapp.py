@@ -216,7 +216,7 @@ class Todolist:
         for tache in taches:
             text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité: {tache[6]}"
             if tache[5]:
-                text_tache += " - Completed"
+                text_tache += " - Terminée"
                 self.taches_listbox.insert(tk.END, text_tache)
                 self.taches_listbox.itemconfig(tk.END, {'fg': 'gray'})
             elif tache[6] == 'Faible' :
