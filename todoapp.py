@@ -280,7 +280,11 @@ class Todolist:
         boutton_annuler = ttk.Button(fenetre_tache, text = "Annuler", command = annuler)
         boutton_annuler.grid(row = 3, column = 0, pady = 5)
     
-
+    
+    
+    
+    
+    
     # def modif_tache(self) :
 
     #     tache_selectionnee = self.taches_listbox.curselection()
