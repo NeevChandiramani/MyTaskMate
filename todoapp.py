@@ -213,7 +213,7 @@ class Todolist:
         self.taches_listbox.delete(0, tk.END)
         taches = obtenir_taches(self.utilisateur_actuel)
         for tache in taches:
-            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité: {tache[6]}"   ## ex échéance 01-01-2001 ou alors 1er janvier 2001
+            text_tache = f"{tache[2]} - Échéance: {tache[4]} - Priorité: {tache[6]}"   ## --- ex échéance 01-01-2001 ou alors 1er janvier 2001 --- 
             if tache[5]:
                 text_tache += " - Terminée"
                 self.taches_listbox.insert(tk.END, text_tache)
