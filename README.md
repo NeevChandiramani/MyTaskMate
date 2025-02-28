@@ -9,8 +9,8 @@ Pour exécuter ce projet, vous devez avoir Python installé sur votre machine. S
 
 1. Clonez ce dépôt sur votre machine locale :
     ```bash
-    git clone https://github.com/NeevChandiramani/NSI-Projet-TodoList.git
-    cd NSI-Projet-TodoList
+    git clone https://github.com/NeevChandiramani/MyTaskMate.git
+    cd MyTaskMate
     ```
 
 2. Créez un environnement virtuel (optionnel mais recommandé) :
