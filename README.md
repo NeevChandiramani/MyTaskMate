@@ -1,6 +1,7 @@
 # 📋 NSI-Projet-TodoList
 
-Bienvenue dans le projet **NSI-Projet-TodoList** ! Cette application est une to-do list écrite en Python avec une interface graphique qui vous aide à gérer vos tâches quotidiennes facilement. 📝✨
+Bienvenue dans le projet de NSI **NSI-Projet-TodoList** ! Cette application est une to-do list écrite en Python avec une interface graphique qui vous aide à gérer vos tâches quotidiennes facilement. 📝✨
+Cette application a été développée dans le cadre d'un projet de fin trimestre. Ce projet à donc été conçu dans les limites de ce cadre. Il peut donc être amélioré davantage.
 
 ## 🚀 Installation
 
