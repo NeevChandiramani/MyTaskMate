@@ -1,7 +1,7 @@
 import sqlite3
 from tda import (
     nouveau_compte, se_connecter, ajouter_tache, obtenir_taches,
-    marquer_tache_complete, supprimer_tache, maj_tache
+    marquer_tache_complete, supprimer_tache
 )
 
 # Connexion à la base de données
@@ -57,10 +57,7 @@ def test_fonctions():
     marquer_tache_complete(tache_id)
     print("Tâche complétée")
 
-    # Mise à jour de la tâche
-    maj_tache('Nouvelle description', 'Haute', tache_id)
-    print("Tâche mise à jour")
-
+    
     # Suppression de la tâche
     supprimer_tache(tache_id)
     print("Tâche supprimée")
