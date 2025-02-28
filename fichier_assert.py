@@ -44,7 +44,7 @@ def test_fonctions():
         print("Connexion réussie")
 
     # Ajout d'une tâche
-    ajouter_tache(user_id, 'Faire les courses', '2025-03-01', 'Moyenne')
+    ajouter_tache(user_id, 'Faire les courses','monoprix', '2025-03-01', 'Moyenne')
     print("Tâche ajoutée")
 
     # Récupération des tâches
