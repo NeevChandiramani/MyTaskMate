@@ -1,4 +1,5 @@
 
+
 import sqlite3
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -49,6 +50,7 @@ def nouveau_compte(nom_identifiant, mot_de_passe) :
         cursor.execute("INSERT INTO utilisateur (identifiant, mdp) VALUES (?, ?)", (nom_identifiant, mot_de_passe))
         conn.commit()
         return True
+    # Permet de vérifier que les veleur de nom_identifiant et mot_de_passe ne sont pas vides
     except sqlite3.IntegrityError :
         return False
 
@@ -95,6 +97,7 @@ def obtenir_taches(id_utilisateur) :
     """int -> list
     Récupère toutes les tâches d'un utilisateur"""
     cursor.execute("SELECT * FROM taches WHERE utilisateur_id = ?", (id_utilisateur,))
+    # La fonction fetchall() retourne tous les enregistrements de la commande sql précédente
     return cursor.fetchall()
 
 
@@ -116,8 +119,10 @@ class Planificateur :
         Vérifie si une tâche est expirée toutes les minutes"""
         while True :
             for tache in self.taches :
-                echeance = datetime.strptime(tache[4], '%d-%m-%Y')
+                # La fonction strptime permet de convertir une chaîne de caractère en une date
+                echeance = datetime.strptime(tache[4], '%d-%m-%Y') 
                 if datetime.now() > echeance :
+                    # La fonction showwarning() permet d'afficher une fenêtre d'avertissement personnalisée
                     messagebox.showwarning("La tâche a expiré")
             # Vérifie toutes les minutes avec le time.sleep
             time.sleep(60)
@@ -127,6 +132,7 @@ class Planificateur :
 # Interface graphique avec tkinter
 class Todolist :
     def __init__(self, principale) :
+        # Permet de définir la fenêtre principale
         self.principale = principale
         self.principale.title("Todolist Tg3 code créateur M.Picard dans la boutique les gars")
         self.utilisateur_actuel = None
@@ -135,11 +141,14 @@ class Todolist :
         self.style.configure("TLabel", font = ("Helvetica", 12))
         self.style.configure("TButton", font = ("Helvetica", 12))
 
+        # La classe Frame du module ttk permet de définir une fenêtre, qui viendra ce placer au dessus de la fenêtre principale
         self.fenetre_connexion = ttk.Frame(principale)
         self.fenetre_connexion.pack(padx = 10, pady = 10)
 
+        # La classe Label du module ttk permet de définir une chaîne de caractère affichable
         self.identifiant_texte = ttk.Label(self.fenetre_connexion, text = "Identifiant")
         self.identifiant_texte.grid(row = 0, column = 0, padx = 5, pady = 5)
+        # La classe Entry du module ttk permet à l'utilisateur d'entrer une chaîne de caractère
         self.identifiant_entree = ttk.Entry(self.fenetre_connexion)
         self.identifiant_entree.grid(row = 0, column = 1, padx = 5, pady = 5)
 
@@ -148,6 +157,7 @@ class Todolist :
         self.mdp_entree = ttk.Entry(self.fenetre_connexion, show = "*")
         self.mdp_entree.grid(row = 1, column = 1, padx = 5, pady = 5)
 
+        # La classe Button du module ttk permet de créer une zone clickable qui exécutera une commande
         self.connexion_bouton = ttk.Button(self.fenetre_connexion, text = "Se connecter", command = self.connexion)
         self.connexion_bouton.grid(row = 2, column=0, columnspan=2, pady = 10)
 
@@ -165,6 +175,7 @@ class Todolist :
             self.utilisateur_actuel = cursor.fetchone()[0]
             self.montrer_fenetre_principale()
         else :
+            # La fonction showerror() permet d'afficher une fenêtre d'erreur personnalisée
             messagebox.showerror("Connection échouée", "L'identifiant ou le mot de passe est incorrect")
 
 
@@ -174,6 +185,7 @@ class Todolist :
         identifiant = self.identifiant_entree.get()
         mdp = self.mdp_entree.get()
         if nouveau_compte(identifiant, mdp) :
+            # La fonction showinfo() permet d'afficher une fenêtre d'information personnalisée
             messagebox.showinfo("Compte créé", "Votre compte a été créé avec succès")
         else:
             messagebox.showerror("Création échouée", "L'identifiant est déjà enregistré")
@@ -182,10 +194,12 @@ class Todolist :
     def montrer_fenetre_principale(self) :
         """Todolist -> None
         Affiche la fenêtre principale de l'application"""
+        # La fonction pack_forget() permet de supprimer une fenêtre affichée à l'écran
         self.fenetre_connexion.pack_forget()
         self.fenetre_principale = ttk.Frame(self.principale)
         self.fenetre_principale.pack(padx = 10, pady = 10)
 
+        # La classe Listbox du module ttk permet de créer une liste d'information
         self.taches_listbox = tk.Listbox(self.fenetre_principale, height = 15, width = 50, font = ("Helvetica", 12))
         self.taches_listbox.grid(row = 0, column = 0, columnspan = 3, padx = 5, pady = 5)
 
@@ -258,7 +272,9 @@ class Todolist :
         prio_texte = ttk.Label(fenetre_tache, text = "Priorité")
         prio_texte.grid(row = 3, column = 0, padx = 5, pady = 5)
 
+        # La class Stringvar permet de vérifier l'état d'un widget à une variable
         choix_prio = tk.StringVar()
+        # La class Combobox permet de créer un widget de sélection
         prio_combobox = ttk.Combobox(fenetre_tache, textvariable = choix_prio)
         prio_combobox["values"] = ("Faible", "Moyenne", "Haute")
         prio_combobox.bind("Séléction", choix_prio.get())
@@ -285,6 +301,7 @@ class Todolist :
                 return
             ajouter_tache(self.utilisateur_actuel, nom_tache, description, echeance, priorite)
             self.rafraichir_taches()
+            # La fonction destroy() permet d'enlever une fenêtre affichée à l'écran
             fenetre_tache.destroy()
 
         def annuler() :
