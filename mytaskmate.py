@@ -134,7 +134,7 @@ class Todolist :
     def __init__(self, principale) :
         # Permet de définir la fenêtre principale
         self.principale = principale
-        self.principale.title("Todolist Tg3 code créateur M. Picard dans la boutique les gars")
+        self.principale.title("MyTaskMate (code créateur M. Picard dans la boutique les gars)")
         self.utilisateur_actuel = None
 
         self.style = ttk.Style()
