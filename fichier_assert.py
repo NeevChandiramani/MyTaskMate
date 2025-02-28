@@ -134,8 +134,10 @@ def test_fonctions():
     print("Tous les tests sont passés !")
     
     # Fermeture de l'interface graphique
-    root.destroy()
+    root.destroy()    #### Une erreur de thème peut apparaître, cette erreur est négligeable et n'affecte pas les tests des fonctions 
 
 test_fonctions()
 conn.close()
+
+
 
