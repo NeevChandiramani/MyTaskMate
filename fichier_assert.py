@@ -7,7 +7,7 @@ from mytaskmate import (
 import tkinter as tk
 from unittest.mock import MagicMock
 
-#IMPORTANT: Vérifier de pas avoir de base de données avant d'éxécuter ce fichier(Supprimer celles créées lors de l'exécution du code principal )
+# IMPORTANT: Vérifier de pas avoir de base de données avant d'éxécuter ce fichier
 
 
 
@@ -132,6 +132,9 @@ def test_fonctions():
     mytaskmate.deconnecter.assert_called_once()
     
     print("Tous les tests sont passés !")
+    
+    print("Une erreur de thème peut apparaître, cette erreur est négligeable et n'affecte pas les tests des fonctions")
+    
     
     # Fermeture de l'interface graphique
     root.destroy()    #### Une erreur de thème peut apparaître, cette erreur est négligeable et n'affecte pas les tests des fonctions 
