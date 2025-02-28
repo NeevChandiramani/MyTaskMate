@@ -76,60 +76,60 @@ def test_fonctions():
     # Tests sur Todolist avec mocks
     root = tk.Tk()
     root.withdraw()  
-    todoapp = Todolist(root)
-    assert todoapp.utilisateur_actuel is None
+    mytaskmate = Todolist(root)
+    assert mytaskmate.utilisateur_actuel is None
     print("Todolist instanciée")
     
     # Mock des méthodes de Todolist pour tester leurs appels
-    todoapp.connexion = MagicMock()
-    todoapp.créer_compte = MagicMock()
-    todoapp.montrer_fenetre_principale = MagicMock()
-    todoapp.rafraichir_taches = MagicMock()
-    todoapp.ajouter_tache = MagicMock()
-    todoapp.date_valide = MagicMock(return_value=True)
-    todoapp.enregistrer_tache = MagicMock()
-    todoapp.annuler = MagicMock()
-    todoapp.description_tache = MagicMock()
-    todoapp.marquer_completee = MagicMock()
-    todoapp.supprimer_tache = MagicMock()
-    todoapp.deconnecter = MagicMock()
+    mytaskmate.connexion = MagicMock()
+    mytaskmate.créer_compte = MagicMock()
+    mytaskmate.montrer_fenetre_principale = MagicMock()
+    mytaskmate.rafraichir_taches = MagicMock()
+    mytaskmate.ajouter_tache = MagicMock()
+    mytaskmate.date_valide = MagicMock(return_value=True)
+    mytaskmate.enregistrer_tache = MagicMock()
+    mytaskmate.annuler = MagicMock()
+    mytaskmate.description_tache = MagicMock()
+    mytaskmate.marquer_completee = MagicMock()
+    mytaskmate.supprimer_tache = MagicMock()
+    mytaskmate.deconnecter = MagicMock()
     
     # Vérification des appels aux méthodes
-    todoapp.connexion()
-    todoapp.connexion.assert_called_once()
+    mytaskmate.connexion()
+    mytaskmate.connexion.assert_called_once()
     
-    todoapp.créer_compte()
-    todoapp.créer_compte.assert_called_once()
+    mytaskmate.créer_compte()
+    mytaskmate.créer_compte.assert_called_once()
     
-    todoapp.montrer_fenetre_principale()
-    todoapp.montrer_fenetre_principale.assert_called_once()
+    mytaskmate.montrer_fenetre_principale()
+    mytaskmate.montrer_fenetre_principale.assert_called_once()
     
-    todoapp.rafraichir_taches()
-    todoapp.rafraichir_taches.assert_called_once()
+    mytaskmate.rafraichir_taches()
+    mytaskmate.rafraichir_taches.assert_called_once()
     
-    todoapp.ajouter_tache()
-    todoapp.ajouter_tache.assert_called_once()
+    mytaskmate.ajouter_tache()
+    mytaskmate.ajouter_tache.assert_called_once()
     
-    todoapp.date_valide("2025-03-01")
-    todoapp.date_valide.assert_called_once()
+    mytaskmate.date_valide("2025-03-01")
+    mytaskmate.date_valide.assert_called_once()
     
-    todoapp.enregistrer_tache()
-    todoapp.enregistrer_tache.assert_called_once()
+    mytaskmate.enregistrer_tache()
+    mytaskmate.enregistrer_tache.assert_called_once()
     
-    todoapp.annuler()
-    todoapp.annuler.assert_called_once()
+    mytaskmate.annuler()
+    mytaskmate.annuler.assert_called_once()
     
-    todoapp.description_tache()
-    todoapp.description_tache.assert_called_once()
+    mytaskmate.description_tache()
+    mytaskmate.description_tache.assert_called_once()
     
-    todoapp.marquer_completee()
-    todoapp.marquer_completee.assert_called_once()
+    mytaskmate.marquer_completee()
+    mytaskmate.marquer_completee.assert_called_once()
     
-    todoapp.supprimer_tache()
-    todoapp.supprimer_tache.assert_called_once()
+    mytaskmate.supprimer_tache()
+    mytaskmate.supprimer_tache.assert_called_once()
     
-    todoapp.deconnecter()
-    todoapp.deconnecter.assert_called_once()
+    mytaskmate.deconnecter()
+    mytaskmate.deconnecter.assert_called_once()
     
     print("Tous les tests sont passés !")
     
