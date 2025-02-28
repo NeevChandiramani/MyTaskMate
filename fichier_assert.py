@@ -4,6 +4,11 @@ from todoapp import (
     marquer_tache_complete, supprimer_tache
 )
 
+
+## Vérifier de pas avoir de base de données avant d'éxécuter ce fichier
+
+
+
 # Connexion à la base de données
 conn = sqlite3.connect('test_todolist.db')
 cursor = conn.cursor()
