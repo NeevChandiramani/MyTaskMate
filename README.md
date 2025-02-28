@@ -33,7 +33,7 @@ python3 mytaskmate.py
 
 L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâches. ✅📅
 
-## 🐞 Bugs / Incohérence connus
+## 🐞 Bugs / Incohérences connus
 
 - [ ] Possibilité d'ajouter des tâches avec une date d'échéance passée.
 
