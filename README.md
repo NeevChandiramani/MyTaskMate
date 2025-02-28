@@ -33,9 +33,9 @@ python3 todoapp.py
 
 L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâches. ✅📅
 
-## 🐞 Bugs connus
+## 🐞 Bugs / Incohérence connus
 
-- [ ] XXXXXXXX
+- [ ] Possibilité d'ajouter des tâches avec une date d'échéance passée.
 
 ## 🌟 Évolutions possibles
 
@@ -45,5 +45,18 @@ L'application vous permettra d'ajouter, de supprimer et de visualiser vos tâche
 - [ ] Partager ses tâches avec d'autres utilisateurs.
 - [ ] Pouvoir modifier des tâches.
 - [ ] Ajouter un système de filtrage et de tri des tâches.
+- [ ] Ajouter des thèmes personnalisés pour l'interface graphique.
+
+## 📚 Ressources
+
+Voici quelques ressources utiles pour vous aider à mieux comprendre et contribuer à ce projet :
+
+- [Documentation officielle de Python](https://docs.python.org/3/)
+- [Guide de l'utilisateur de pip](https://pip.pypa.io/en/stable/user_guide/)
+- [Tutoriel sur les environnements virtuels Python](https://docs.python.org/3/tutorial/venv.html)
+- [Documentation de Tkinter pour les interfaces graphiques](https://docs.python.org/3/library/tkinter.html)
+
+Merci d'avoir choisi de contribuer à **NSI-Projet-TodoList** ! Votre aide est précieuse et contribue à améliorer ce projet pour tout le monde. 🎉
 
 N'hésitez pas à contribuer à ce projet en soumettant des pull requests ou en ouvrant des issues pour signaler des bugs ou proposer des améliorations. 🙌
+Si vous avez des questions ou des suggestions, n'hésitez pas à me contacter à partir du site Web de mon [portfolio](https://neevchandiramani.com). 📧
