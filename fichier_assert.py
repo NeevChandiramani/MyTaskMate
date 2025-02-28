@@ -5,6 +5,9 @@ from todoapp import (
 )
 import tkinter as tk
 
+## Vérifier de pas avoir de base de données avant d'éxécuter ce fichier
+
+
 # Connexion à la base de données
 test_db = 'test_todolist.db'
 conn = sqlite3.connect(test_db)
