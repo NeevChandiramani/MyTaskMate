@@ -56,7 +56,7 @@ Voici quelques ressources utiles pour vous aider à mieux comprendre et contribu
 - [Tutoriel sur les environnements virtuels Python](https://docs.python.org/3/tutorial/venv.html)
 - [Documentation de Tkinter pour les interfaces graphiques](https://docs.python.org/3/library/tkinter.html)
 
-Merci d'avoir choisi de contribuer à **NSI-Projet-TodoList** ! Votre aide est précieuse et contribue à améliorer ce projet pour tout le monde. 🎉
+Merci de contribuer à **NSI-Projet-TodoList** ! Votre aide est précieuse et contribue à améliorer ce projet pour tout le monde. 🎉
 
 N'hésitez pas à contribuer à ce projet en soumettant des pull requests ou en ouvrant des issues pour signaler des bugs ou proposer des améliorations. 🙌
 Si vous avez des questions ou des suggestions, n'hésitez pas à me contacter à partir du site Web de mon [portfolio](https://neevchandiramani.com). 📧
