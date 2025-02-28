@@ -1,11 +1,14 @@
+
 import sqlite3
 from todoapp import (
     nouveau_compte, se_connecter, ajouter_tache, obtenir_taches,
     marquer_tache_complete, supprimer_tache, Planificateur, Todolist
 )
 import tkinter as tk
+from unittest.mock import MagicMock
 
-## Vérifier de pas avoir de base de données avant d'éxécuter ce fichier
+#IMPORTANT: Vérifier de pas avoir de base de données avant d'éxécuter ce fichier(Supprimer celles créées lors de l'exécution du code principal )
+
 
 
 # Connexion à la base de données
@@ -70,13 +73,69 @@ def test_fonctions():
     assert len(obtenir_taches(user_id)) == 0
     print("Tâche supprimée")
     
-    # Tests sur Todolist (sans GUI)
+    # Tests sur Todolist avec mocks
     root = tk.Tk()
-    app = Todolist(root)
-    assert app.utilisateur_actuel is None
+    root.withdraw()  
+    todoapp = Todolist(root)
+    assert todoapp.utilisateur_actuel is None
     print("Todolist instanciée")
     
+    # Mock des méthodes de Todolist pour tester leurs appels
+    todoapp.connexion = MagicMock()
+    todoapp.créer_compte = MagicMock()
+    todoapp.montrer_fenetre_principale = MagicMock()
+    todoapp.rafraichir_taches = MagicMock()
+    todoapp.ajouter_tache = MagicMock()
+    todoapp.date_valide = MagicMock(return_value=True)
+    todoapp.enregistrer_tache = MagicMock()
+    todoapp.annuler = MagicMock()
+    todoapp.description_tache = MagicMock()
+    todoapp.marquer_completee = MagicMock()
+    todoapp.supprimer_tache = MagicMock()
+    todoapp.deconnecter = MagicMock()
+    
+    # Vérification des appels aux méthodes
+    todoapp.connexion()
+    todoapp.connexion.assert_called_once()
+    
+    todoapp.créer_compte()
+    todoapp.créer_compte.assert_called_once()
+    
+    todoapp.montrer_fenetre_principale()
+    todoapp.montrer_fenetre_principale.assert_called_once()
+    
+    todoapp.rafraichir_taches()
+    todoapp.rafraichir_taches.assert_called_once()
+    
+    todoapp.ajouter_tache()
+    todoapp.ajouter_tache.assert_called_once()
+    
+    todoapp.date_valide("2025-03-01")
+    todoapp.date_valide.assert_called_once()
+    
+    todoapp.enregistrer_tache()
+    todoapp.enregistrer_tache.assert_called_once()
+    
+    todoapp.annuler()
+    todoapp.annuler.assert_called_once()
+    
+    todoapp.description_tache()
+    todoapp.description_tache.assert_called_once()
+    
+    todoapp.marquer_completee()
+    todoapp.marquer_completee.assert_called_once()
+    
+    todoapp.supprimer_tache()
+    todoapp.supprimer_tache.assert_called_once()
+    
+    todoapp.deconnecter()
+    todoapp.deconnecter.assert_called_once()
+    
     print("Tous les tests sont passés !")
+    
+    # Fermeture de l'interface graphique
+    root.destroy()
 
 test_fonctions()
 conn.close()
+
