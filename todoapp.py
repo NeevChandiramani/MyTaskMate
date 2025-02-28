@@ -299,6 +299,9 @@ class Todolist :
         bouton_annuler.grid(row = 4, column = 0, padx = 5, pady = 5)
     
     
+    """Les fonctions commentées ne fonctionnent pas."""
+    
+    
     # def modif_tache(self) :
     #     """Todolist -> None
     #     Modifie la description et la priorité d'une tâche"""
