@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS utilisateur (
 )
 """)
 
-# "NOT NULL" indique que la valeur ne peut pas être nul
+# "NOT NULL" indique que la valeur ne peut pas être nulle
 # "AUTOINCREMENT" génère automatiquement une valeur unique pour chaque enregistrement
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS taches (
